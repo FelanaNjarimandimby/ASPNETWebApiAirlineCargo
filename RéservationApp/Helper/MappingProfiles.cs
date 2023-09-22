@@ -16,7 +16,7 @@ namespace RéservationApp.Helper
             CreateMap<MarchandiseDto, Marchandise>();
             CreateMap<Vol, VolDto>();
             CreateMap<VolDto, Vol>();
-            CreateMap<Reservation, ReservationDto>();
+            CreateMap<Reservation, ReservationDto>().ForMember(d => d.IDClient, a => a.MapFrom(s => s.Client.IDClient)).ReverseMap();
             CreateMap<ReservationDto, Reservation>();
             CreateMap<Vente, VenteDto>();
             CreateMap<LTA, LtaDto>();

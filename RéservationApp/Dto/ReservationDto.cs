@@ -1,4 +1,6 @@
-﻿namespace RéservationApp.Dto
+﻿using RéservationApp.Models;
+
+namespace RéservationApp.Dto
 {
     public class ReservationDto
     {
@@ -9,5 +11,7 @@
         public DateTime DateExpeditionSouhaite { get; set; }
         public string ExigencesSpeciales { get; set; }
         public string EtatReservation { get; set; }
+        public int IDClient { get; set; }
+
     }
 }

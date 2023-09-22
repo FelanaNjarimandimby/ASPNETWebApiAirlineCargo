@@ -27,7 +27,7 @@ namespace RéservationApp.Repository
 
         public ICollection<Reservation> GetReservations()
         {
-            return _context.Reservations.ToList();
+            return _context.Reservations.Include(res => res.Client).ToList();   
         }
 
         public ICollection<Reservation> GetReservationsofClient(int id)

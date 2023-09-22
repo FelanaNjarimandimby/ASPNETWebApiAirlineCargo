@@ -1,17 +1,15 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RéservationApp.Data;
 using RéservationApp.Dto;
 using RéservationApp.Interfaces;
 using RéservationApp.Models;
-using RéservationApp.Repository;
-using System.Net.Sockets;
 
-namespace RéservationApp.Controllers
+namespace RéservationApp.Controllers.ClientControllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReservationController : Controller
+    
+    public class Cli_ReservationController : Controller
     {
         private readonly IReservationRepository _reservationRespository;
         private readonly IClientRepository _clientRepository;
@@ -19,7 +17,7 @@ namespace RéservationApp.Controllers
         private readonly IVolRepository _volRepository;
         private readonly IMapper _mapper;
 
-        public ReservationController(IReservationRepository reservationRepository,
+        public Cli_ReservationController(IReservationRepository reservationRepository,
             IClientRepository clientRepository,
             IMarchandiseRepository marchandiseRepository,
             IVolRepository volRepository,
@@ -78,17 +76,17 @@ namespace RéservationApp.Controllers
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        
-        public IActionResult CreateReservation([FromQuery] int marchandiseID, [FromQuery] int volNUM ,[FromBody] ReservationDto reservationCreate)
+
+        public IActionResult CreateReservation([FromQuery] int marchandiseID, [FromQuery] int volNUM, [FromBody] ReservationDto reservationCreate)
         {
-            if(reservationCreate == null)
+            if (reservationCreate == null)
                 return BadRequest(ModelState);
 
             var reservation = _reservationRespository.GetReservations()
             .Where(res => res.NomDestinaire.Trim().ToUpper() == reservationCreate.NomDestinaire.TrimEnd().ToUpper())
             .FirstOrDefault();
 
-            if(reservation != null)
+            if (reservation != null)
             {
                 ModelState.AddModelError("", "Réservation existe déjà!");
                 return StatusCode(422, ModelState);
@@ -108,15 +106,15 @@ namespace RéservationApp.Controllers
             }
 
             reservationMap.Marchandise = _marchandiseRepository.GetMarchandise(marchandiseID);
-            
-            if(reservationMap.Marchandise == null)
+
+            if (reservationMap.Marchandise == null)
             {
                 ModelState.AddModelError("", "Cette marchandise existe pas!");
                 return StatusCode(422, ModelState);
             }
 
             reservationMap.Vol = _volRepository.GetVol(volNUM);
-            if(reservationMap.Vol == null)
+            if (reservationMap.Vol == null)
             {
                 ModelState.AddModelError("", "Ce vol existe pas!");
                 return StatusCode(422, ModelState);
@@ -147,12 +145,12 @@ namespace RéservationApp.Controllers
             if (!_reservationRespository.ReservationExists(reservationRef))
                 return NotFound();
 
-            if(!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return BadRequest();
 
             var reservationMap = _mapper.Map<Reservation>(reservationUpdate);
 
-            if(!_reservationRespository.UpdateReservation(reservationMap))
+            if (!_reservationRespository.UpdateReservation(reservationMap))
             {
                 ModelState.AddModelError("", "Le serveur a rencontré un problème");
                 return StatusCode(500, ModelState);
@@ -161,5 +159,5 @@ namespace RéservationApp.Controllers
             return Ok("Modification de la réservation avec succès");
         }
     }
+    
 }
-

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "i6rGMuLiYRNxTvLRk5+VMx0RBYfnoQM1Cs0qoYMpMWeXPH5h+nJlOGUF1rOGTNJbpPSHg/8Jt/VB390gV7j9sg==",
+  "dgSpecHash": "Vtpye8kRFcxo9NM0LJSEInguoV05wbKqr7fe+5ayFsPpes/Y0AGu4AdmyXQM99/pkbaYE79jAoxbjU+Hd0/j8w==",
   "success": true,
-  "projectFilePath": "D:\\exemple .NET\\RéservationApp\\RéservationApp\\RéservationApp.csproj",
+  "projectFilePath": "D:\\exemple .NET\\Projet Stage\\RéservationApp\\RéservationApp\\RéservationApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Felana\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\Felana\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

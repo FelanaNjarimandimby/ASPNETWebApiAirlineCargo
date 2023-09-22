@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\exemple .NET\\RéservationApp\\RéservationApp\\RéservationApp.csproj": {}
+    "D:\\exemple .NET\\Projet Stage\\RéservationApp\\RéservationApp\\RéservationApp.csproj": {}
   },
   "projects": {
-    "D:\\exemple .NET\\RéservationApp\\RéservationApp\\RéservationApp.csproj": {
+    "D:\\exemple .NET\\Projet Stage\\RéservationApp\\RéservationApp\\RéservationApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\exemple .NET\\RéservationApp\\RéservationApp\\RéservationApp.csproj",
+        "projectUniqueName": "D:\\exemple .NET\\Projet Stage\\RéservationApp\\RéservationApp\\RéservationApp.csproj",
         "projectName": "RéservationApp",
-        "projectPath": "D:\\exemple .NET\\RéservationApp\\RéservationApp\\RéservationApp.csproj",
+        "projectPath": "D:\\exemple .NET\\Projet Stage\\RéservationApp\\RéservationApp\\RéservationApp.csproj",
         "packagesPath": "C:\\Users\\Felana\\.nuget\\packages\\",
-        "outputPath": "D:\\exemple .NET\\RéservationApp\\RéservationApp\\obj\\",
+        "outputPath": "D:\\exemple .NET\\Projet Stage\\RéservationApp\\RéservationApp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Felana\\AppData\\Roaming\\NuGet\\NuGet.Config",
