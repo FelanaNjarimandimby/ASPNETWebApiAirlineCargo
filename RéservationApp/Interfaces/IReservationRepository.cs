@@ -7,6 +7,7 @@ namespace RéservationApp.Interfaces
         ICollection<Reservation> GetReservations();
         Reservation GetReservation(int idReservation);
         ICollection<Reservation> GetReservationsofClient(int id);
+        decimal GetTarifReservation(int IDReservation);
         bool ReservationExists(int idReservation);
         bool CreateReservation (Reservation reservation);
         bool UpdateReservation(Reservation reservation);

@@ -12,6 +12,9 @@ namespace RéservationApp.Dto
         public string ExigencesSpeciales { get; set; }
         public string EtatReservation { get; set; }
         public int IDClient { get; set; }
+        public int IDMarchandise { get; set; }
+        //public MarchandiseDto Marchandise { get; set; }
+        public int NumVol { get; set; }
 
     }
 }

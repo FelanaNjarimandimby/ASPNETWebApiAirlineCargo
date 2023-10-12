@@ -4,6 +4,13 @@ using RéservationApp.Data;
 using RéservationApp.Interfaces;
 using RéservationApp.Repository;
 using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using RéservationApp.Models.ModèleLogin;
+using RéservationApp.Models;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +26,47 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IVenteRepository, VenteRepository>();
 builder.Services.AddScoped<ILtaRepository, LtaRepository>();
 builder.Services.AddScoped<ITarifRepository, TarifRepository>();
+builder.Services.AddScoped<ITarifNatureRepository, TarifNatureRepository>();
+builder.Services.AddScoped<ICoutFretRepository, CoutFretRepository>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+builder.Services.AddTransient<IRefreshTokenGenerator, RefreshTokenGenerator>();
+
+
+//Get JWTsetting
+var _dbcontext = builder.Services.BuildServiceProvider().GetService<DataContext>();
+builder.Services.AddSingleton<IRefreshTokenGenerator>(provider => new RefreshTokenGenerator(_dbcontext));
+
+var _jwtsetting = builder.Configuration.GetSection("JWTSetting");
+builder.Services.Configure<JWTSetting>(_jwtsetting);
+
+var authkey = builder.Configuration.GetValue<string>("JWTSetting:securitykey");
+
+builder.Services.AddAuthentication(item =>
+{
+    item.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    item.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(item =>
+{
+
+    item.RequireHttpsMetadata = true;
+    item.SaveToken = true;
+    item.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authkey)),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ClockSkew=TimeSpan.Zero
+    };
 });
 
 
@@ -37,7 +79,8 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins("http://localhost:3000")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
         });
 });
 
@@ -57,6 +100,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//Authentification
+app.UseAuthentication();
 
 app.UseAuthorization();
 

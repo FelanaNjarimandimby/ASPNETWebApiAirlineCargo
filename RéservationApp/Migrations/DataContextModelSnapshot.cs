@@ -51,6 +51,28 @@ namespace RéservationApp.Migrations
                     b.ToTable("Clients");
                 });
 
+            modelBuilder.Entity("RéservationApp.Models.CoutFret", b =>
+                {
+                    b.Property<int>("IDCout")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDCout"));
+
+                    b.Property<double>("Cout")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("PoidsMax")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("PoidsMin")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("IDCout");
+
+                    b.ToTable("CoutFrets");
+                });
+
             modelBuilder.Entity("RéservationApp.Models.LTA", b =>
                 {
                     b.Property<int>("RefReservation")
@@ -107,6 +129,134 @@ namespace RéservationApp.Migrations
                     b.ToTable("Marchandises");
                 });
 
+            modelBuilder.Entity("RéservationApp.Models.ModèleLogin.TblMenu", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("LinkName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tbl_menu", (string)null);
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.ModèleLogin.TblPermission", b =>
+                {
+                    b.Property<string>("RoleId")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("MenuId")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("RoleId", "MenuId");
+
+                    b.ToTable("tbl_permission", (string)null);
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.ModèleLogin.TblRefreshtoken", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TokenId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("tbl_refreshtoken", (string)null);
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.ModèleLogin.TblRole", b =>
+                {
+                    b.Property<string>("Roleid")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("roleid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Roleid");
+
+                    b.ToTable("tbl_role", (string)null);
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.ModèleLogin.TblUser", b =>
+                {
+                    b.Property<string>("Userid")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("userid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValueSql("true");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("password");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Userid");
+
+                    b.ToTable("tbl_user", (string)null);
+                });
+
             modelBuilder.Entity("RéservationApp.Models.Nature_Marchandise", b =>
                 {
                     b.Property<int>("IDNatureMarchandise")
@@ -119,7 +269,12 @@ namespace RéservationApp.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("TypeTarifIDTypeTarif")
+                        .HasColumnType("integer");
+
                     b.HasKey("IDNatureMarchandise");
+
+                    b.HasIndex("TypeTarifIDTypeTarif");
 
                     b.ToTable("Nature_Marchandises");
                 });
@@ -191,25 +346,49 @@ namespace RéservationApp.Migrations
                     b.ToTable("Tarifs");
                 });
 
-            modelBuilder.Entity("RéservationApp.Models.Utilisateur", b =>
+            modelBuilder.Entity("RéservationApp.Models.TarifNature", b =>
                 {
-                    b.Property<int>("IDUtilisaeur")
+                    b.Property<int>("IDTarifNature")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDUtilisaeur"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDTarifNature"));
 
-                    b.Property<string>("MotPasse")
+                    b.Property<int>("MarchandiseIDMarchandise")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("PoidsTaxable")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("TypeTarif")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("NomUtilisateur")
+                    b.HasKey("IDTarifNature");
+
+                    b.HasIndex("MarchandiseIDMarchandise");
+
+                    b.ToTable("TarifNature");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.TypeTarif", b =>
+                {
+                    b.Property<int>("IDTypeTarif")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDTypeTarif"));
+
+                    b.Property<string>("LibelleTarif")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("IDUtilisaeur");
+                    b.Property<double>("ValeurTarif")
+                        .HasColumnType("double precision");
 
-                    b.ToTable("Utilisateurs");
+                    b.HasKey("IDTypeTarif");
+
+                    b.ToTable("TypeTarifs");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Vente", b =>
@@ -289,6 +468,17 @@ namespace RéservationApp.Migrations
                     b.Navigation("Nature_Marchandise");
                 });
 
+            modelBuilder.Entity("RéservationApp.Models.Nature_Marchandise", b =>
+                {
+                    b.HasOne("RéservationApp.Models.TypeTarif", "TypeTarif")
+                        .WithMany("Nature_Marchandises")
+                        .HasForeignKey("TypeTarifIDTypeTarif")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TypeTarif");
+                });
+
             modelBuilder.Entity("RéservationApp.Models.Reservation", b =>
                 {
                     b.HasOne("RéservationApp.Models.Client", "Client")
@@ -316,6 +506,17 @@ namespace RéservationApp.Migrations
                     b.Navigation("Vol");
                 });
 
+            modelBuilder.Entity("RéservationApp.Models.TarifNature", b =>
+                {
+                    b.HasOne("RéservationApp.Models.Marchandise", "Marchandise")
+                        .WithMany("TarifNatures")
+                        .HasForeignKey("MarchandiseIDMarchandise")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Marchandise");
+                });
+
             modelBuilder.Entity("RéservationApp.Models.Vente", b =>
                 {
                     b.HasOne("RéservationApp.Models.LTA", "LTA")
@@ -340,6 +541,8 @@ namespace RéservationApp.Migrations
             modelBuilder.Entity("RéservationApp.Models.Marchandise", b =>
                 {
                     b.Navigation("Reservations");
+
+                    b.Navigation("TarifNatures");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Nature_Marchandise", b =>
@@ -355,6 +558,11 @@ namespace RéservationApp.Migrations
             modelBuilder.Entity("RéservationApp.Models.Tarif", b =>
                 {
                     b.Navigation("LTAs");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.TypeTarif", b =>
+                {
+                    b.Navigation("Nature_Marchandises");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Vol", b =>

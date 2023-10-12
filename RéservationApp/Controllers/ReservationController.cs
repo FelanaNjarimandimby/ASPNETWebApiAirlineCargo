@@ -6,6 +6,7 @@ using RéservationApp.Interfaces;
 using RéservationApp.Models;
 using RéservationApp.Repository;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 
 namespace RéservationApp.Controllers
 {
@@ -19,7 +20,8 @@ namespace RéservationApp.Controllers
         private readonly IVolRepository _volRepository;
         private readonly IMapper _mapper;
 
-        public ReservationController(IReservationRepository reservationRepository,
+        public ReservationController(
+            IReservationRepository reservationRepository,
             IClientRepository clientRepository,
             IMarchandiseRepository marchandiseRepository,
             IVolRepository volRepository,
@@ -79,13 +81,21 @@ namespace RéservationApp.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         
-        public IActionResult CreateReservation([FromQuery] int marchandiseID, [FromQuery] int volNUM ,[FromBody] ReservationDto reservationCreate)
+        public IActionResult CreateReservation([FromBody] ReservationDto reservationCreate)
         {
             if(reservationCreate == null)
                 return BadRequest(ModelState);
 
             var reservation = _reservationRespository.GetReservations()
-            .Where(res => res.NomDestinaire.Trim().ToUpper() == reservationCreate.NomDestinaire.TrimEnd().ToUpper())
+            .Where(res => res.NomDestinaire.Trim().ToUpper() == reservationCreate.NomDestinaire.TrimEnd().ToUpper()
+            && res.AeroportDepart.Trim().ToUpper() == reservationCreate.AeroportDepart.TrimEnd().ToUpper()
+            && res.AeroportDestination.Trim().ToUpper() == reservationCreate.AeroportDestination.TrimEnd().ToUpper()
+            && res.DateExpeditionSouhaite == reservationCreate.DateExpeditionSouhaite 
+            && res.ExigencesSpeciales.Trim().ToUpper() == reservationCreate.ExigencesSpeciales.TrimEnd().ToUpper()
+            && res.EtatReservation.Trim().ToUpper() == reservationCreate.EtatReservation.ToUpper()
+            && res.Client.IDClient == reservationCreate.IDClient
+            && res.Marchandise.IDMarchandise == reservationCreate.IDMarchandise
+            && res.Vol.NumVol == reservationCreate.NumVol)
             .FirstOrDefault();
 
             if(reservation != null)
@@ -99,6 +109,7 @@ namespace RéservationApp.Controllers
 
             var reservationMap = _mapper.Map<Reservation>(reservationCreate);
 
+            //Récuperation du client
             reservationMap.Client = _clientRepository.GetClient(reservationCreate.IDClient);
 
             if (!_clientRepository.ClientExists(reservationCreate.IDClient))
@@ -107,16 +118,20 @@ namespace RéservationApp.Controllers
                 return StatusCode(422, ModelState);
             }
 
-            reservationMap.Marchandise = _marchandiseRepository.GetMarchandise(marchandiseID);
+
+            //Récuperation de la marchandise
+
+            reservationMap.Marchandise = _marchandiseRepository.GetMarchandise(reservationCreate.IDMarchandise);
             
-            if(reservationMap.Marchandise == null)
+            if (!_marchandiseRepository.MarchandiseExists(reservationCreate.IDMarchandise))
             {
                 ModelState.AddModelError("", "Cette marchandise existe pas!");
                 return StatusCode(422, ModelState);
             }
 
-            reservationMap.Vol = _volRepository.GetVol(volNUM);
-            if(reservationMap.Vol == null)
+            //Récuperation du vol
+            reservationMap.Vol = _volRepository.GetVol(reservationCreate.NumVol);
+            if (!_volRepository.VolExists(reservationCreate.NumVol))
             {
                 ModelState.AddModelError("", "Ce vol existe pas!");
                 return StatusCode(422, ModelState);

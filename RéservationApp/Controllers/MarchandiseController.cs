@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RéservationApp.Data;
 using RéservationApp.Dto;
 using RéservationApp.Interfaces;
 using RéservationApp.Models;
 using RéservationApp.Repository;
+using System.Text.RegularExpressions;
 
 namespace RéservationApp.Controllers
 {
@@ -15,12 +18,17 @@ namespace RéservationApp.Controllers
         private readonly IMarchandiseRepository _marchandiseRepository;
         private readonly INature_MarchandiseRepository _nature_marchandiseRepository;
         private readonly IMapper _mapper;
+        private readonly DataContext _context;
 
-        public MarchandiseController(IMarchandiseRepository marchandiseRepository, INature_MarchandiseRepository nature_MarchandiseRepository,IMapper mapper)
+        public MarchandiseController(IMarchandiseRepository marchandiseRepository, 
+            INature_MarchandiseRepository nature_MarchandiseRepository,
+            IMapper mapper,
+            DataContext context)
         {
             _marchandiseRepository = marchandiseRepository;
             _nature_marchandiseRepository = nature_MarchandiseRepository;
             _mapper = mapper;
+            _context = context;
         }
 
         [HttpGet]
@@ -67,11 +75,64 @@ namespace RéservationApp.Controllers
             return Ok(natures);
         }
 
+
+        [HttpGet("rapportVP/{IDMarchandise}")]
+        [ProducesResponseType(200, Type = typeof(double))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetRapportVolumePoids(int IDMarchandise)
+        {
+            if (!_marchandiseRepository.MarchandiseExists(IDMarchandise))
+                return NotFound();
+
+            var marchandise = _marchandiseRepository.GetRapportVolumePoids(IDMarchandise);
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(marchandise);
+        }
+
+        [HttpGet("poidsTaxation/{IDMarchandise}")]
+        [ProducesResponseType(200, Type = typeof(double))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetPoidsTaxation(int IDMarchandise)
+        {
+            if (!_marchandiseRepository.MarchandiseExists(IDMarchandise))
+                return NotFound();
+
+            var marchandise = _marchandiseRepository.GetPoidsTaxation(IDMarchandise);
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(marchandise);
+        }
+
+        [HttpPost("getID")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetID([FromBody] MarchandiseDto marchandiseCreate)
+        {
+           var marchandise = _context.Marchandises.FirstOrDefault(m => m.Designation == marchandiseCreate.Designation 
+                && m.NombreColis == marchandiseCreate.NombreColis && m.Poids == marchandiseCreate.Poids 
+                && m.Dimension == marchandiseCreate.Dimension && m.Volume == marchandiseCreate.Volume 
+                && m.Nature_Marchandise.Libelle == marchandiseCreate.Libelle);
+            
+            if (marchandise == null)
+                return BadRequest(ModelState);
+
+            return Ok(marchandise.IDMarchandise);
+        }
+
+
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
 
-        public IActionResult CreateMarchandise([FromQuery] int natureID, [FromBody] MarchandiseDto marchandiseCreate)
+        public IActionResult CreateMarchandise([FromBody] MarchandiseDto marchandiseCreate)
         {
             if(marchandiseCreate == null)
                 return BadRequest(ModelState);
@@ -91,9 +152,15 @@ namespace RéservationApp.Controllers
 
             var marchandiseMap = _mapper.Map<Marchandise>(marchandiseCreate);
 
-            marchandiseMap.Nature_Marchandise = _nature_marchandiseRepository.GetNature_Marchandise(natureID);
 
-            if(!_marchandiseRepository.CreateMarchandise(marchandiseMap))
+            marchandiseMap.Nature_Marchandise = _nature_marchandiseRepository.GetNature(marchandiseCreate.Libelle);
+            if (marchandiseMap.Nature_Marchandise == null)
+            {
+                ModelState.AddModelError("", "Marchandise existe déjà!");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!_marchandiseRepository.CreateMarchandise(marchandiseMap))
             {
                 ModelState.AddModelError("", "Le serveur a rencontré un problème");
                 return StatusCode(500, ModelState);

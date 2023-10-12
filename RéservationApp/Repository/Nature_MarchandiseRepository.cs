@@ -26,6 +26,11 @@ namespace RéservationApp.Repository
             return _context.Marchandises.Where(nat => nat.Nature_Marchandise.IDNatureMarchandise == natureID).ToList();
         }
 
+        public Nature_Marchandise GetNature(string Libelle)
+        {
+            return _context.Nature_Marchandises.Where(nat => nat.Libelle == Libelle).FirstOrDefault();
+        }
+
         public Nature_Marchandise GetNature_Marchandise(int id)
         {
             return _context.Nature_Marchandises.Where(nat => nat.IDNatureMarchandise == id).FirstOrDefault();

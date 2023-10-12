@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RéservationApp.Dto;
 using RéservationApp.Interfaces;
@@ -6,17 +7,20 @@ using RéservationApp.Models;
 
 namespace RéservationApp.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : Controller
     {
         private readonly IClientRepository _clientRepository;
         private readonly IMapper _mapper;
+        private readonly IReservationRepository _reservationRepository;
 
-        public ClientController(IClientRepository clientRepository, IMapper mapper)
+        public ClientController(IClientRepository clientRepository, IReservationRepository reservationRepository, IMapper mapper)
         {
             _clientRepository = clientRepository;
             _mapper = mapper;
+            _reservationRepository = reservationRepository;
         }
 
         [HttpGet]
@@ -46,6 +50,42 @@ namespace RéservationApp.Controllers
                 return BadRequest(ModelState);
 
             return Ok(client);
+        }
+
+        [HttpGet("reservation/{IDClient}")]
+        [ProducesResponseType(200, Type = typeof(Client))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetReservations(int IDClient)
+        {
+
+            if (!_clientRepository.ClientExists(IDClient))
+                if(!_reservationRepository.ReservationExists(IDClient))
+                return NotFound();
+
+            var reservations = _mapper.Map<List<ReservationDto>>(_clientRepository.GetReservations(IDClient));
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(reservations);
+        }
+
+        [HttpGet("nombre_reservation/{IDClient}")]
+        [ProducesResponseType(200, Type = typeof(int))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetNombreReservationByClient(int IDClient)
+        {
+            if (!_clientRepository.ClientExists(IDClient))
+                return NotFound();
+
+            var reservation = _clientRepository.GetNombreReservationByClient(IDClient);
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(reservation);
         }
 
         [HttpGet("{FindID}/reservation")]

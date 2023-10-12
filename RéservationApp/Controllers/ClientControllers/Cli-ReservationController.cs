@@ -120,11 +120,11 @@ namespace RéservationApp.Controllers.ClientControllers
                 return StatusCode(422, ModelState);
             }
 
-            if (!_reservationRespository.CreateReservation(reservationMap))
+         /*   if (!_reservationRespository.CreateReservation(reservationMap))
             {
                 ModelState.AddModelError("", "Le serveur a rencontré un problème");
                 return StatusCode(500, ModelState);
-            }
+            }  */
 
             return Ok("Réservation ajoutée avec succès");
         }

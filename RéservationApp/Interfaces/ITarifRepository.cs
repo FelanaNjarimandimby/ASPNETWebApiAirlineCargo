@@ -6,6 +6,7 @@ namespace RéservationApp.Interfaces
     {
         ICollection<Tarif> GetTarifs();
         Tarif GetTarif(int id);
+        //bool CreateTarif(int RefReservation);
         bool TarifExists(int id);
     }
 }

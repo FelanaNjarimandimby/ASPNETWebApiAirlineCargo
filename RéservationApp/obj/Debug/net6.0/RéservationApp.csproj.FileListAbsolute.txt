@@ -118,3 +118,11 @@ D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\obj\Debug\net6.0\re
 D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\obj\Debug\net6.0\RéservationApp.pdb
 D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\obj\Debug\net6.0\RéservationApp.genruntimeconfig.cache
 D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\obj\Debug\net6.0\ref\RéservationApp.dll
+D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\bin\Debug\net6.0\Microsoft.IdentityModel.Abstractions.dll
+D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\bin\Debug\net6.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\bin\Debug\net6.0\Microsoft.IdentityModel.Logging.dll
+D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.dll
+D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
+D:\exemple .NET\Projet Stage\RéservationApp\RéservationApp\bin\Debug\net6.0\System.IdentityModel.Tokens.Jwt.dll

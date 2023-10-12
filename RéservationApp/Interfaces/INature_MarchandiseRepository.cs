@@ -6,6 +6,7 @@ namespace RéservationApp.Interfaces
     {
         ICollection<Nature_Marchandise> GetNature_Marchandises();
         Nature_Marchandise GetNature_Marchandise(int id);
+        Nature_Marchandise GetNature(string Libelle);
         Nature_Marchandise GetNature_MarchandiseByMarchandise(int MarchandiseID);
         ICollection<Marchandise> GetMarchandiseFromNature(int natureID);
         bool Nature_MarchandiseExists(int id);

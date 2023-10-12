@@ -54,6 +54,21 @@ namespace RéservationApp.Repository
             return _context.Clients.OrderBy(cli => cli.IDClient).ToList();
         }
 
+        public int GetNombreReservationByClient(int IDClient)
+        {
+            var reservation = _context.Reservations.Where(res => res.Client.IDClient == IDClient);
+
+            if (reservation.Count() <= 0)
+                return 0;
+
+            return (int)reservation.Count();
+        }
+
+        public ICollection<Reservation> GetReservations(int IDClient)
+        {
+            return _context.Reservations.Where(res => res.Client.IDClient == IDClient).OrderBy(res => res.RefReservation).ToList();
+        }
+
         public bool Save()
         {
             var saved = _context.SaveChanges();

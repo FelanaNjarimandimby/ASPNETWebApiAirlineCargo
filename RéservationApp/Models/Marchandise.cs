@@ -13,5 +13,6 @@ namespace RéservationApp.Models
         public string Volume { get; set; }
         public ICollection<Reservation> Reservations { get; set; }
         public Nature_Marchandise Nature_Marchandise { get; set; }
+        public ICollection<TarifNature> TarifNatures { get; set; }
     }
 }

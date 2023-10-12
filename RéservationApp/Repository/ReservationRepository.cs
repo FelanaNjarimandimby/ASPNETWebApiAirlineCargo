@@ -27,12 +27,17 @@ namespace RéservationApp.Repository
 
         public ICollection<Reservation> GetReservations()
         {
-            return _context.Reservations.Include(res => res.Client).ToList();   
+            return _context.Reservations.Include(res => res.Client).Include(res => res.Marchandise).Include(res => res.Vol).ToList();
         }
 
         public ICollection<Reservation> GetReservationsofClient(int id)
         {
             return _context.Reservations.Where(res => res.Client.IDClient == id).ToList();
+        }
+
+        public decimal GetTarifReservation(int IDReservation)
+        {
+            throw new NotImplementedException();
         }
 
         public bool ReservationExists(int idReservation)
