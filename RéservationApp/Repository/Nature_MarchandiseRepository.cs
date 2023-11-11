@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
 using RéservationApp.Data;
 using RéservationApp.Interfaces;
@@ -23,32 +24,32 @@ namespace RéservationApp.Repository
 
         public ICollection<Marchandise> GetMarchandiseFromNature(int natureID)
         {
-            return _context.Marchandises.Where(nat => nat.Nature_Marchandise.IDNatureMarchandise == natureID).ToList();
+            return _context.Marchandises.Where(nat => nat.Nature_Marchandise.id == natureID).ToList();
         }
 
         public Nature_Marchandise GetNature(string Libelle)
         {
-            return _context.Nature_Marchandises.Where(nat => nat.Libelle == Libelle).FirstOrDefault();
+            return _context.Nature_Marchandises.Where(nat => nat.NatureMarchandiseLibelle == Libelle).FirstOrDefault();
         }
 
-        public Nature_Marchandise GetNature_Marchandise(int id)
+        public Nature_Marchandise GetNature_Marchandise(int ID)
         {
-            return _context.Nature_Marchandises.Where(nat => nat.IDNatureMarchandise == id).FirstOrDefault();
+            return _context.Nature_Marchandises.Include(nat => nat.TypeTarif).Where(nat => nat.id == ID).FirstOrDefault();
         }
 
         public Nature_Marchandise GetNature_MarchandiseByMarchandise(int MarchandiseID)
         {
-            return _context.Marchandises.Where(mar => mar.IDMarchandise == MarchandiseID).Select(nat => nat.Nature_Marchandise).FirstOrDefault();
+            return _context.Marchandises.Where(mar => mar.id == MarchandiseID).Select(nat => nat.Nature_Marchandise).FirstOrDefault();
         }
 
         public ICollection<Nature_Marchandise> GetNature_Marchandises()
         {
-            return _context.Nature_Marchandises.ToList();
+            return _context.Nature_Marchandises.Include(nat => nat.TypeTarif).ToList();
         }
 
-        public bool Nature_MarchandiseExists(int id)
+        public bool Nature_MarchandiseExists(int ID)
         {
-            return _context.Nature_Marchandises.Any(n => n.IDNatureMarchandise == id);
+            return _context.Nature_Marchandises.Any(n => n.id == ID);
         }
 
         public bool Save()

@@ -14,35 +14,39 @@ namespace RéservationApp.Repository
              _context = context;
         }
 
+        public Reservation GetReservation(int ReservationID)
+        {
+            return _context.Reservations.Include(res => res.Client).Include(res => res.Marchandise).
+                Include(res => res.VolCargo).Include(res => res.Itineraire)
+                .Where(res => res.id == ReservationID).FirstOrDefault();
+        }
+
         public bool CreateReservation(Reservation reservation)
         {
             _context.Add(reservation);
             return Save();
         }
 
-        public Reservation GetReservation(int idReservation)
-        {
-            return _context.Reservations.Where(res => res.RefReservation == idReservation).FirstOrDefault();
-        }
-
         public ICollection<Reservation> GetReservations()
         {
-            return _context.Reservations.Include(res => res.Client).Include(res => res.Marchandise).Include(res => res.Vol).ToList();
+            return _context.Reservations.Include(res => res.Client).Include(res => res.Marchandise).
+                Include(res => res.VolCargo).Include(res => res.Itineraire).ToList();
         }
 
-        public ICollection<Reservation> GetReservationsofClient(int id)
+        public ICollection<Reservation> GetReservationsofClient(int ID)
         {
-            return _context.Reservations.Where(res => res.Client.IDClient == id).ToList();
+            return _context.Reservations.Include(res => res.Client).Include(res => res.Marchandise).
+                Include(res => res.VolCargo).Include(res => res.Itineraire).Where(res => res.Client.id == ID).ToList();
         }
 
-        public decimal GetTarifReservation(int IDReservation)
+        public decimal GetTarifReservation(int ReservationID)
         {
             throw new NotImplementedException();
         }
 
-        public bool ReservationExists(int idReservation)
+        public bool ReservationExists(int ID)
         {
-            return _context.Reservations.Any(res => res.RefReservation == idReservation);
+            return _context.Reservations.Any(res => res.id == ID);
         }
 
         public bool Save()
@@ -55,6 +59,19 @@ namespace RéservationApp.Repository
         {
             _context.Update(reservation);
             return Save();
+        }
+
+        public bool DeleteReservation(Reservation reservation)
+        {
+            _context.Remove(reservation);
+            return Save();
+        }
+
+        public Reservation GetReservationByClient(int ID)
+        {
+            return _context.Reservations.Include(res => res.Client).Include(res => res.Marchandise).
+                Include(res => res.VolCargo).Include(res => res.Itineraire)
+                .Where(res => res.Client.id == ID).FirstOrDefault();
         }
     }
 }

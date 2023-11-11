@@ -2,7 +2,9 @@
 {
     public class VenteDto
     {
-        public int IDVente { get; set; }
-        public DateTime DateVente { get; set; }
+        public int id { get; set; }
+        public DateTime VenteDate { get; set; }
+        public int ReservationID { get; set; }
+        public int AgentID { get; set; }
     }
 }

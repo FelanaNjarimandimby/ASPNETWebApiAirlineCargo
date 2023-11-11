@@ -22,109 +22,323 @@ namespace RéservationApp.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("RéservationApp.Models.Client", b =>
+            modelBuilder.Entity("RéservationApp.Models.Aeroport", b =>
                 {
-                    b.Property<int>("IDClient")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDClient"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<string>("Adresse")
+                    b.Property<string>("AeroportCodeIATA")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Mail")
+                    b.Property<string>("AeroportCodeOACI")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("NomClient")
+                    b.Property<string>("AeroportContact")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Telephone")
+                    b.Property<string>("AeroportLocalisation")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("IDClient");
+                    b.Property<string>("AeroportNom")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Compagnieid")
+                        .HasColumnType("integer");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("Compagnieid");
+
+                    b.ToTable("Aeroports");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Agent", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<string>("AgentAdresse")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AgentContact")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AgentFonction")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AgentGenre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AgentMail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AgentMotPasse")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AgentNom")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AgentPrenom")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Agents");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.AvionCargo", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<double>("AvionCapacite")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("AvionModele")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("id");
+
+                    b.ToTable("AvionCargos");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Client", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<string>("ClientAdresse")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientContact")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientMail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientMotPasse")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientNom")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientPrenom")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("ClientMail")
+                        .IsUnique();
 
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("RéservationApp.Models.CoutFret", b =>
+            modelBuilder.Entity("RéservationApp.Models.Compagnie", b =>
                 {
-                    b.Property<int>("IDCout")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDCout"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<string>("CompagnieNom")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Compagnies");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.CoutFret", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<int>("Agentid")
+                        .HasColumnType("integer");
 
                     b.Property<double>("Cout")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("PoidsMax")
+                    b.Property<double>("CoutPoidsMax")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("PoidsMin")
+                    b.Property<double>("CoutPoidsMin")
                         .HasColumnType("double precision");
 
-                    b.HasKey("IDCout");
+                    b.HasKey("id");
+
+                    b.HasIndex("Agentid");
 
                     b.ToTable("CoutFrets");
                 });
 
+            modelBuilder.Entity("RéservationApp.Models.Escale", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<string>("EscaleNumero")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EscaleVille")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("VolCargoid")
+                        .HasColumnType("integer");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("VolCargoid");
+
+                    b.ToTable("Escales");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Exemple", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("cal1")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("cal2")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("chiffre")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("firstname")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("lastname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Exemples");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Itineraire", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<string>("ItineraireArrive")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ItineraireDepart")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Itineraires");
+                });
+
             modelBuilder.Entity("RéservationApp.Models.LTA", b =>
                 {
-                    b.Property<int>("RefReservation")
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    b.Property<int>("IDTarif")
-                        .HasColumnType("integer");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<DateTime>("DateLTA")
+                    b.Property<DateTime>("LTADateEmission")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("NumLTA")
+                    b.Property<string>("LTANumero")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Venteid")
                         .HasColumnType("integer");
 
-                    b.HasKey("RefReservation", "IDTarif");
+                    b.HasKey("id");
 
-                    b.HasIndex("IDTarif");
+                    b.HasIndex("Venteid");
 
                     b.ToTable("LTAs");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Marchandise", b =>
                 {
-                    b.Property<int>("IDMarchandise")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDMarchandise"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<string>("Designation")
+                    b.Property<string>("MarchandiseDesignation")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("Dimension")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("Nature_MarchandiseIDNatureMarchandise")
+                    b.Property<int>("MarchandiseNombre")
                         .HasColumnType("integer");
 
-                    b.Property<int>("NombreColis")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("Poids")
+                    b.Property<double>("MarchandisePoids")
                         .HasColumnType("double precision");
 
-                    b.Property<string>("Volume")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<double>("MarchandiseVolume")
+                        .HasColumnType("double precision");
 
-                    b.HasKey("IDMarchandise");
+                    b.Property<int>("Nature_Marchandiseid")
+                        .HasColumnType("integer");
 
-                    b.HasIndex("Nature_MarchandiseIDNatureMarchandise");
+                    b.HasKey("id");
+
+                    b.HasIndex("Nature_Marchandiseid");
 
                     b.ToTable("Marchandises");
                 });
@@ -259,209 +473,247 @@ namespace RéservationApp.Migrations
 
             modelBuilder.Entity("RéservationApp.Models.Nature_Marchandise", b =>
                 {
-                    b.Property<int>("IDNatureMarchandise")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDNatureMarchandise"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<string>("Libelle")
+                    b.Property<string>("NatureMarchandiseLibelle")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("TypeTarifIDTypeTarif")
+                    b.Property<int>("TypeTarifid")
                         .HasColumnType("integer");
 
-                    b.HasKey("IDNatureMarchandise");
+                    b.HasKey("id");
 
-                    b.HasIndex("TypeTarifIDTypeTarif");
+                    b.HasIndex("TypeTarifid");
 
                     b.ToTable("Nature_Marchandises");
                 });
 
-            modelBuilder.Entity("RéservationApp.Models.Reservation", b =>
+            modelBuilder.Entity("RéservationApp.Models.Notification", b =>
                 {
-                    b.Property<int>("RefReservation")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RefReservation"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<string>("AeroportDepart")
+                    b.Property<int>("Clientid")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Reservationid")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Vue")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("AeroportDestination")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.HasKey("id");
 
-                    b.Property<int>("ClientIDClient")
+                    b.HasIndex("Clientid");
+
+                    b.HasIndex("Reservationid");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Reservation", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<int>("Clientid")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("DateExpeditionSouhaite")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("EtatReservation")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ExigencesSpeciales")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("MarchandiseIDMarchandise")
+                    b.Property<int>("Itineraireid")
                         .HasColumnType("integer");
 
-                    b.Property<string>("NomDestinaire")
+                    b.Property<int>("Marchandiseid")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NomDestinataire")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("VolNumVol")
+                    b.Property<DateTime>("ReservationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReservationEtat")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReservationExigences")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("VolCargoid")
                         .HasColumnType("integer");
 
-                    b.HasKey("RefReservation");
+                    b.HasKey("id");
 
-                    b.HasIndex("ClientIDClient");
+                    b.HasIndex("Clientid");
 
-                    b.HasIndex("MarchandiseIDMarchandise");
+                    b.HasIndex("Itineraireid");
 
-                    b.HasIndex("VolNumVol");
+                    b.HasIndex("Marchandiseid");
+
+                    b.HasIndex("VolCargoid");
 
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("RéservationApp.Models.Tarif", b =>
-                {
-                    b.Property<int>("IDTarif")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDTarif"));
-
-                    b.Property<int>("Montant")
-                        .HasColumnType("integer");
-
-                    b.HasKey("IDTarif");
-
-                    b.ToTable("Tarifs");
-                });
-
-            modelBuilder.Entity("RéservationApp.Models.TarifNature", b =>
-                {
-                    b.Property<int>("IDTarifNature")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDTarifNature"));
-
-                    b.Property<int>("MarchandiseIDMarchandise")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("PoidsTaxable")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("TypeTarif")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("IDTarifNature");
-
-                    b.HasIndex("MarchandiseIDMarchandise");
-
-                    b.ToTable("TarifNature");
-                });
-
             modelBuilder.Entity("RéservationApp.Models.TypeTarif", b =>
                 {
-                    b.Property<int>("IDTypeTarif")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDTypeTarif"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<string>("LibelleTarif")
+                    b.Property<double>("TarifAnnexe")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("TarifFraisAssurance")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("TarifLibelle")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("ValeurTarif")
+                    b.Property<double>("TarifValeur")
                         .HasColumnType("double precision");
 
-                    b.HasKey("IDTypeTarif");
+                    b.HasKey("id");
 
                     b.ToTable("TypeTarifs");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Vente", b =>
                 {
-                    b.Property<int>("IDVente")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IDVente"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<DateTime>("DateVente")
+                    b.Property<int>("Agentid")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Reservationid")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("VenteDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("LTAIDTarif")
-                        .HasColumnType("integer");
+                    b.HasKey("id");
 
-                    b.Property<int>("LTARefReservation")
-                        .HasColumnType("integer");
+                    b.HasIndex("Agentid");
 
-                    b.HasKey("IDVente");
-
-                    b.HasIndex("LTARefReservation", "LTAIDTarif");
+                    b.HasIndex("Reservationid");
 
                     b.ToTable("Ventes");
                 });
 
-            modelBuilder.Entity("RéservationApp.Models.Vol", b =>
+            modelBuilder.Entity("RéservationApp.Models.VolCargo", b =>
                 {
-                    b.Property<int>("NumVol")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NumVol"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<string>("CapaciteChargement")
+                    b.Property<int>("Aeroportid")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AvionCargoid")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Itineraireid")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("VolDateHeureArrivee")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("VolDateHeureDepart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("VolNumero")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("DateArrivee")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("VolStatut")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<DateTime>("DateDepart")
-                        .HasColumnType("timestamp with time zone");
+                    b.HasKey("id");
 
-                    b.HasKey("NumVol");
+                    b.HasIndex("Aeroportid");
 
-                    b.ToTable("Vols");
+                    b.HasIndex("AvionCargoid");
+
+                    b.HasIndex("Itineraireid");
+
+                    b.ToTable("VolCargos");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Aeroport", b =>
+                {
+                    b.HasOne("RéservationApp.Models.Compagnie", "Compagnie")
+                        .WithMany("Aeroports")
+                        .HasForeignKey("Compagnieid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Compagnie");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.CoutFret", b =>
+                {
+                    b.HasOne("RéservationApp.Models.Agent", "Agent")
+                        .WithMany("CoutFrets")
+                        .HasForeignKey("Agentid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agent");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Escale", b =>
+                {
+                    b.HasOne("RéservationApp.Models.VolCargo", "VolCargo")
+                        .WithMany("Escales")
+                        .HasForeignKey("VolCargoid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("VolCargo");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.LTA", b =>
                 {
-                    b.HasOne("RéservationApp.Models.Tarif", "Tarif")
+                    b.HasOne("RéservationApp.Models.Vente", "Vente")
                         .WithMany("LTAs")
-                        .HasForeignKey("IDTarif")
+                        .HasForeignKey("Venteid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RéservationApp.Models.Reservation", "Reservation")
-                        .WithMany("LTAs")
-                        .HasForeignKey("RefReservation")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Reservation");
-
-                    b.Navigation("Tarif");
+                    b.Navigation("Vente");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Marchandise", b =>
                 {
                     b.HasOne("RéservationApp.Models.Nature_Marchandise", "Nature_Marchandise")
                         .WithMany("Marchandises")
-                        .HasForeignKey("Nature_MarchandiseIDNatureMarchandise")
+                        .HasForeignKey("Nature_Marchandiseid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -472,77 +724,152 @@ namespace RéservationApp.Migrations
                 {
                     b.HasOne("RéservationApp.Models.TypeTarif", "TypeTarif")
                         .WithMany("Nature_Marchandises")
-                        .HasForeignKey("TypeTarifIDTypeTarif")
+                        .HasForeignKey("TypeTarifid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("TypeTarif");
                 });
 
-            modelBuilder.Entity("RéservationApp.Models.Reservation", b =>
+            modelBuilder.Entity("RéservationApp.Models.Notification", b =>
                 {
                     b.HasOne("RéservationApp.Models.Client", "Client")
-                        .WithMany("Reservations")
-                        .HasForeignKey("ClientIDClient")
+                        .WithMany("Notifications")
+                        .HasForeignKey("Clientid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RéservationApp.Models.Marchandise", "Marchandise")
-                        .WithMany("Reservations")
-                        .HasForeignKey("MarchandiseIDMarchandise")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RéservationApp.Models.Vol", "Vol")
-                        .WithMany("Reservations")
-                        .HasForeignKey("VolNumVol")
+                    b.HasOne("RéservationApp.Models.Reservation", "Reservation")
+                        .WithMany("Notifications")
+                        .HasForeignKey("Reservationid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Client");
 
-                    b.Navigation("Marchandise");
-
-                    b.Navigation("Vol");
+                    b.Navigation("Reservation");
                 });
 
-            modelBuilder.Entity("RéservationApp.Models.TarifNature", b =>
+            modelBuilder.Entity("RéservationApp.Models.Reservation", b =>
                 {
-                    b.HasOne("RéservationApp.Models.Marchandise", "Marchandise")
-                        .WithMany("TarifNatures")
-                        .HasForeignKey("MarchandiseIDMarchandise")
+                    b.HasOne("RéservationApp.Models.Client", "Client")
+                        .WithMany("Reservations")
+                        .HasForeignKey("Clientid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("RéservationApp.Models.Itineraire", "Itineraire")
+                        .WithMany("Reservations")
+                        .HasForeignKey("Itineraireid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RéservationApp.Models.Marchandise", "Marchandise")
+                        .WithMany("Reservations")
+                        .HasForeignKey("Marchandiseid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RéservationApp.Models.VolCargo", "VolCargo")
+                        .WithMany("Reservations")
+                        .HasForeignKey("VolCargoid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Itineraire");
+
                     b.Navigation("Marchandise");
+
+                    b.Navigation("VolCargo");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Vente", b =>
                 {
-                    b.HasOne("RéservationApp.Models.LTA", "LTA")
+                    b.HasOne("RéservationApp.Models.Agent", "Agent")
                         .WithMany("Ventes")
-                        .HasForeignKey("LTARefReservation", "LTAIDTarif")
+                        .HasForeignKey("Agentid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LTA");
+                    b.HasOne("RéservationApp.Models.Reservation", "Reservation")
+                        .WithMany("Ventes")
+                        .HasForeignKey("Reservationid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agent");
+
+                    b.Navigation("Reservation");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.VolCargo", b =>
+                {
+                    b.HasOne("RéservationApp.Models.Aeroport", "Aeroport")
+                        .WithMany("VolCargos")
+                        .HasForeignKey("Aeroportid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RéservationApp.Models.AvionCargo", "AvionCargo")
+                        .WithMany("VolCargos")
+                        .HasForeignKey("AvionCargoid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RéservationApp.Models.Itineraire", "Itineraire")
+                        .WithMany("VolCargos")
+                        .HasForeignKey("Itineraireid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Aeroport");
+
+                    b.Navigation("AvionCargo");
+
+                    b.Navigation("Itineraire");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Aeroport", b =>
+                {
+                    b.Navigation("VolCargos");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Agent", b =>
+                {
+                    b.Navigation("CoutFrets");
+
+                    b.Navigation("Ventes");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.AvionCargo", b =>
+                {
+                    b.Navigation("VolCargos");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Client", b =>
                 {
+                    b.Navigation("Notifications");
+
                     b.Navigation("Reservations");
                 });
 
-            modelBuilder.Entity("RéservationApp.Models.LTA", b =>
+            modelBuilder.Entity("RéservationApp.Models.Compagnie", b =>
                 {
-                    b.Navigation("Ventes");
+                    b.Navigation("Aeroports");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.Itineraire", b =>
+                {
+                    b.Navigation("Reservations");
+
+                    b.Navigation("VolCargos");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Marchandise", b =>
                 {
                     b.Navigation("Reservations");
-
-                    b.Navigation("TarifNatures");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.Nature_Marchandise", b =>
@@ -552,12 +879,9 @@ namespace RéservationApp.Migrations
 
             modelBuilder.Entity("RéservationApp.Models.Reservation", b =>
                 {
-                    b.Navigation("LTAs");
-                });
+                    b.Navigation("Notifications");
 
-            modelBuilder.Entity("RéservationApp.Models.Tarif", b =>
-                {
-                    b.Navigation("LTAs");
+                    b.Navigation("Ventes");
                 });
 
             modelBuilder.Entity("RéservationApp.Models.TypeTarif", b =>
@@ -565,8 +889,15 @@ namespace RéservationApp.Migrations
                     b.Navigation("Nature_Marchandises");
                 });
 
-            modelBuilder.Entity("RéservationApp.Models.Vol", b =>
+            modelBuilder.Entity("RéservationApp.Models.Vente", b =>
                 {
+                    b.Navigation("LTAs");
+                });
+
+            modelBuilder.Entity("RéservationApp.Models.VolCargo", b =>
+                {
+                    b.Navigation("Escales");
+
                     b.Navigation("Reservations");
                 });
 #pragma warning restore 612, 618

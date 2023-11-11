@@ -18,17 +18,14 @@ namespace RéservationApp.Controllers
         private readonly IMarchandiseRepository _marchandiseRepository;
         private readonly INature_MarchandiseRepository _nature_marchandiseRepository;
         private readonly IMapper _mapper;
-        private readonly DataContext _context;
 
         public MarchandiseController(IMarchandiseRepository marchandiseRepository, 
             INature_MarchandiseRepository nature_MarchandiseRepository,
-            IMapper mapper,
-            DataContext context)
+            IMapper mapper)
         {
             _marchandiseRepository = marchandiseRepository;
             _nature_marchandiseRepository = nature_MarchandiseRepository;
             _mapper = mapper;
-            _context = context;
         }
 
         [HttpGet]
@@ -76,16 +73,16 @@ namespace RéservationApp.Controllers
         }
 
 
-        [HttpGet("rapportVP/{IDMarchandise}")]
+        [HttpGet("rapportVP/{MarchandiseID}")]
         [ProducesResponseType(200, Type = typeof(double))]
         [ProducesResponseType(400)]
 
-        public IActionResult GetRapportVolumePoids(int IDMarchandise)
+        public IActionResult GetRapportVolumePoids(int MarchandiseID)
         {
-            if (!_marchandiseRepository.MarchandiseExists(IDMarchandise))
+            if (!_marchandiseRepository.MarchandiseExists(MarchandiseID))
                 return NotFound();
 
-            var marchandise = _marchandiseRepository.GetRapportVolumePoids(IDMarchandise);
+            var marchandise = _marchandiseRepository.GetRapportVolumePoids(MarchandiseID);
 
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -93,16 +90,50 @@ namespace RéservationApp.Controllers
             return Ok(marchandise);
         }
 
-        [HttpGet("poidsTaxation/{IDMarchandise}")]
+        [HttpGet("poidsTaxation/{MarchandiseID}")]
         [ProducesResponseType(200, Type = typeof(double))]
         [ProducesResponseType(400)]
 
-        public IActionResult GetPoidsTaxation(int IDMarchandise)
+        public IActionResult GetPoidsTaxation(int MarchandiseID)
         {
-            if (!_marchandiseRepository.MarchandiseExists(IDMarchandise))
+            if (!_marchandiseRepository.MarchandiseExists(MarchandiseID))
                 return NotFound();
 
-            var marchandise = _marchandiseRepository.GetPoidsTaxation(IDMarchandise);
+            var marchandise = _marchandiseRepository.GetPoidsTaxation(MarchandiseID);
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(marchandise);
+        }
+
+        [HttpGet("tarifNature/{MarchandiseID}")]
+        [ProducesResponseType(200, Type = typeof(double))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetTarifNature(int MarchandiseID)
+        {
+            if (!_marchandiseRepository.MarchandiseExists(MarchandiseID))
+                return NotFound();
+
+            var marchandise = _marchandiseRepository.GetTarifBase(MarchandiseID);
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(marchandise);
+        }
+
+        [HttpGet("tarif/{MarchandiseID}")]
+        [ProducesResponseType(200, Type = typeof(double))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetTarif(int MarchandiseID)
+        {
+            if (!_marchandiseRepository.MarchandiseExists(MarchandiseID))
+                return NotFound();
+
+            var marchandise = _marchandiseRepository.GetTarif(MarchandiseID);
 
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -116,15 +147,18 @@ namespace RéservationApp.Controllers
 
         public IActionResult GetID([FromBody] MarchandiseDto marchandiseCreate)
         {
-           var marchandise = _context.Marchandises.FirstOrDefault(m => m.Designation == marchandiseCreate.Designation 
-                && m.NombreColis == marchandiseCreate.NombreColis && m.Poids == marchandiseCreate.Poids 
-                && m.Dimension == marchandiseCreate.Dimension && m.Volume == marchandiseCreate.Volume 
-                && m.Nature_Marchandise.Libelle == marchandiseCreate.Libelle);
+           var marchandise = _marchandiseRepository.GetMarchandises().Where(
+               m => m.MarchandiseDesignation == marchandiseCreate.MarchandiseDesignation
+                && m.MarchandiseNombre == marchandiseCreate.MarchandiseNombre 
+                && m.MarchandisePoids == marchandiseCreate.MarchandisePoids
+                && m.MarchandiseVolume == marchandiseCreate.MarchandiseVolume
+                && m.Nature_Marchandise.NatureMarchandiseLibelle == marchandiseCreate.NatureMarchandiseLibelle)
+                .FirstOrDefault();
             
             if (marchandise == null)
                 return BadRequest(ModelState);
 
-            return Ok(marchandise.IDMarchandise);
+            return Ok(marchandise.id);
         }
 
 
@@ -137,26 +171,16 @@ namespace RéservationApp.Controllers
             if(marchandiseCreate == null)
                 return BadRequest(ModelState);
 
-            var marchandise = _marchandiseRepository.GetMarchandises()
-                .Where(mar => mar.Designation.Trim().ToUpper() == marchandiseCreate.Designation.TrimEnd().ToUpper())
-                .FirstOrDefault();
-
-            if(marchandise != null)
-            {
-                ModelState.AddModelError("", "Marchandise existe déjà!");
-                return StatusCode(422, ModelState);
-            }
-
+            
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var marchandiseMap = _mapper.Map<Marchandise>(marchandiseCreate);
 
-
-            marchandiseMap.Nature_Marchandise = _nature_marchandiseRepository.GetNature(marchandiseCreate.Libelle);
+            marchandiseMap.Nature_Marchandise = _nature_marchandiseRepository.GetNature(marchandiseCreate.NatureMarchandiseLibelle);
             if (marchandiseMap.Nature_Marchandise == null)
             {
-                ModelState.AddModelError("", "Marchandise existe déjà!");
+                ModelState.AddModelError("", "Nature de marchandise n'existe pas!");
                 return StatusCode(422, ModelState);
             }
 
@@ -179,7 +203,7 @@ namespace RéservationApp.Controllers
             if (marchandiseUpdate == null)
                 return BadRequest(ModelState);
 
-            if(marchandiseID != marchandiseUpdate.IDMarchandise)
+            if(marchandiseID != marchandiseUpdate.id)
                 return BadRequest(ModelState);
 
             if (!_marchandiseRepository.MarchandiseExists(marchandiseID))

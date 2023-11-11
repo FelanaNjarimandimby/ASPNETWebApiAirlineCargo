@@ -17,7 +17,7 @@ namespace RéservationApp.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class UtilisateurController : Controller
-    {
+    {/*
         private readonly IUtilisateurRepository _utilisateurRepository;
         private readonly IRefreshTokenGenerator _refreshTokenGenerator;
         private readonly DataContext _context;
@@ -85,7 +85,7 @@ namespace RéservationApp.Controllers
             tokenResponse.RefreshToken = _refreshTokenGenerator.GenerateToken(user.Mail);
 
             return Ok(tokenResponse);
-        }
+        }*/
 
         /*
         [Route("Refresh")]

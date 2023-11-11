@@ -5,12 +5,15 @@ namespace RéservationApp.Interfaces
     public interface IReservationRepository
     {
         ICollection<Reservation> GetReservations();
-        Reservation GetReservation(int idReservation);
-        ICollection<Reservation> GetReservationsofClient(int id);
-        decimal GetTarifReservation(int IDReservation);
-        bool ReservationExists(int idReservation);
+        Reservation GetReservation(int ReservationID);
+        ICollection<Reservation> GetReservationsofClient(int ID);
+
+        Reservation GetReservationByClient(int ID);
+        decimal GetTarifReservation(int ReservationID);
+        bool ReservationExists(int ID);
         bool CreateReservation (Reservation reservation);
         bool UpdateReservation(Reservation reservation);
-        bool Save();
+        bool DeleteReservation(Reservation reservation);
+        bool Save(); 
     }
 }

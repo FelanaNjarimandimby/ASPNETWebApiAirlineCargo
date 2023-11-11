@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using RéservationApp.Data;
 using RéservationApp.Dto;
+using RéservationApp.Helper;
 using RéservationApp.Interfaces;
 using RéservationApp.Models;
 
@@ -15,12 +18,20 @@ namespace RéservationApp.Controllers
         private readonly IClientRepository _clientRepository;
         private readonly IMapper _mapper;
         private readonly IReservationRepository _reservationRepository;
+        private readonly JwtService _jwtService;
+        private readonly DataContext _context;
 
-        public ClientController(IClientRepository clientRepository, IReservationRepository reservationRepository, IMapper mapper)
+        public ClientController(IClientRepository clientRepository,
+            IReservationRepository reservationRepository,
+            IMapper mapper,
+            JwtService jwtService,
+            DataContext context)
         {
             _clientRepository = clientRepository;
             _mapper = mapper;
             _reservationRepository = reservationRepository;
+            _jwtService = jwtService;
+            _context = context;
         }
 
         [HttpGet]
@@ -35,16 +46,16 @@ namespace RéservationApp.Controllers
             return Ok(clients);
         }
 
-        [HttpGet("{FindID}")]
+        [HttpGet("{ClientID}")]
         [ProducesResponseType(200, Type = typeof(Client))]
         [ProducesResponseType(400)]
 
-        public IActionResult GetClient(int FindID)
+        public IActionResult GetClient(int ClientID)
         {
-            if (!_clientRepository.ClientExists(FindID))
+            if (!_clientRepository.ClientExists(ClientID))
                 return NotFound();
 
-            var client = _mapper.Map<ClientDto>(_clientRepository.GetClient(FindID));
+            var client = _mapper.Map<ClientDto>(_clientRepository.GetClient(ClientID));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -52,18 +63,18 @@ namespace RéservationApp.Controllers
             return Ok(client);
         }
 
-        [HttpGet("reservation/{IDClient}")]
+        [HttpGet("reservation/{ClientID}")]
         [ProducesResponseType(200, Type = typeof(Client))]
         [ProducesResponseType(400)]
 
-        public IActionResult GetReservations(int IDClient)
+        public IActionResult GetReservations(int ClientID)
         {
 
-            if (!_clientRepository.ClientExists(IDClient))
-                if(!_reservationRepository.ReservationExists(IDClient))
-                return NotFound();
+            if (!_clientRepository.ClientExists(ClientID))
+                if (!_reservationRepository.ReservationExists(ClientID))
+                    return NotFound();
 
-            var reservations = _mapper.Map<List<ReservationDto>>(_clientRepository.GetReservations(IDClient));
+            var reservations = _mapper.Map<List<ReservationDto>>(_clientRepository.GetReservations(ClientID));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -71,16 +82,16 @@ namespace RéservationApp.Controllers
             return Ok(reservations);
         }
 
-        [HttpGet("nombre_reservation/{IDClient}")]
+        [HttpGet("nombre_reservation/{ClientID}")]
         [ProducesResponseType(200, Type = typeof(int))]
         [ProducesResponseType(400)]
 
-        public IActionResult GetNombreReservationByClient(int IDClient)
+        public IActionResult GetNombreReservationByClient(int ClientID)
         {
-            if (!_clientRepository.ClientExists(IDClient))
+            if (!_clientRepository.ClientExists(ClientID))
                 return NotFound();
 
-            var reservation = _clientRepository.GetNombreReservationByClient(IDClient);
+            var reservation = _clientRepository.GetNombreReservationByClient(ClientID);
 
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -88,16 +99,16 @@ namespace RéservationApp.Controllers
             return Ok(reservation);
         }
 
-        [HttpGet("{FindID}/reservation")]
+        [HttpGet("{ClientID}/reservation")]
         [ProducesResponseType(200, Type = typeof(decimal))]
         [ProducesResponseType(400)]
 
-        public IActionResult GetClientReservation(int FindID)
+        public IActionResult GetClientReservation(int ClientID)
         {
-            if (!_clientRepository.ClientExists(FindID))
+            if (!_clientRepository.ClientExists(ClientID))
                 return NotFound();
 
-            var reservation = _clientRepository.GetClientReservation(FindID);
+            var reservation = _clientRepository.GetClientReservation(ClientID);
 
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -108,36 +119,83 @@ namespace RéservationApp.Controllers
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        
+
         public IActionResult CreateClient([FromBody] ClientDto clientDto)
         {
-            if (clientDto == null)
-                return BadRequest(ModelState);
-
-            var client = _clientRepository.GetClients()
-                .Where(c => c.NomClient.Trim().ToUpper() == clientDto.NomClient.TrimEnd().ToUpper())
-                .FirstOrDefault();
-
-            if (client != null)
+            var client = new Client
             {
-                ModelState.AddModelError("", "Client existe déjà");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var clientMap = _mapper.Map<Client>(clientDto);
-
-            if (!_clientRepository.CreateClient(clientMap))
-            {
-                ModelState.AddModelError("", "Le serveur a rencontré un problème");
-                return StatusCode(500, ModelState);
-            }
+                ClientNom = clientDto.ClientNom,
+                ClientPrenom = clientDto.ClientPrenom,
+                ClientMail = clientDto.ClientMail,
+                ClientAdresse = clientDto.ClientAdresse,
+                ClientContact = clientDto.ClientContact,
+                ClientMotPasse = clientDto.ClientMotPasse,
+            };
+            _clientRepository.CreateClient(client);
 
             return Ok("Client ajouté avec succès");
 
         }
+
+        [HttpPost("login")]
+        public IActionResult Login(ClientLoginDto clientLoginDto)
+        {
+            var client = _clientRepository.GetClientMail(clientLoginDto.ClientMail);
+
+            if (client == null)
+                return BadRequest(new { message = "Invalid Credentials" });
+
+            if (!(clientLoginDto.ClientMotPasse == client.ClientMotPasse))
+            {
+                return BadRequest(new { message = "Invalid Credentials" });
+            }
+
+            var jwt = _jwtService.Generate(client.id);
+
+            Response.Cookies.Append("jwt", jwt, new CookieOptions
+            {
+                HttpOnly = true
+                //SameSite = SameSiteMode.None
+            });
+
+            return Ok(new
+            {
+                message = "success"
+            });
+        }
+
+        [HttpGet("client")]
+        public IActionResult Client()
+        {
+            try
+            {
+                var jwt = Request.Cookies["jwt"];
+
+                var token = _jwtService.Verify(jwt);
+
+                int userId = int.Parse(token.Issuer);
+
+                var client = _mapper.Map<ClientDto>(_clientRepository.GetClient(userId));
+
+                return Ok(client);
+            }
+            catch (Exception)
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("jwt");
+
+            return Ok(new
+            {
+                message = "success"
+            });
+        }
+
 
         [HttpPut("{clientID}")]
         [ProducesResponseType(400)]
@@ -149,7 +207,7 @@ namespace RéservationApp.Controllers
             if (updatedClient == null)
                 return BadRequest(ModelState);
 
-            if (clientID != updatedClient.IDClient)
+            if (clientID != updatedClient.id)
                 return BadRequest(ModelState);
 
             if (!_clientRepository.ClientExists(clientID))
@@ -158,12 +216,28 @@ namespace RéservationApp.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var clientMap = _mapper.Map<Client>(updatedClient);
+            var client = _clientRepository.GetClients().Where(
+            c => c.id == clientID).FirstOrDefault();
+
+            if(client != null)
+            {
+                client.ClientNom = updatedClient.ClientNom;
+                client.ClientPrenom = updatedClient.ClientPrenom;
+                client.ClientMail = updatedClient.ClientMail;
+                client.ClientAdresse = updatedClient.ClientAdresse;
+                client.ClientContact = updatedClient.ClientContact;
+                client.ClientMotPasse = client.ClientMotPasse;
+
+                _context.SaveChanges();
+
+            };
+
+/*
             if (!_clientRepository.UpdateClient(clientMap))
             {
                 ModelState.AddModelError("", "Le serveur a rencontré un problème");
                 return StatusCode(500, ModelState);
-            }
+            }*/
 
             return Ok("Modification du client avec succès");
         }

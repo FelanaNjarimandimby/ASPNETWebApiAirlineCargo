@@ -10,7 +10,7 @@ namespace RéservationApp.Controllers.ClientControllers
     [ApiController]
     
     public class Cli_ReservationController : Controller
-    {
+    {/*
         private readonly IReservationRepository _reservationRespository;
         private readonly IClientRepository _clientRepository;
         private readonly IMarchandiseRepository _marchandiseRepository;
@@ -120,11 +120,11 @@ namespace RéservationApp.Controllers.ClientControllers
                 return StatusCode(422, ModelState);
             }
 
-         /*   if (!_reservationRespository.CreateReservation(reservationMap))
-            {
-                ModelState.AddModelError("", "Le serveur a rencontré un problème");
-                return StatusCode(500, ModelState);
-            }  */
+         //  if (!_reservationRespository.CreateReservation(reservationMap))
+           // {
+             //   ModelState.AddModelError("", "Le serveur a rencontré un problème");
+               // return StatusCode(500, ModelState);
+            //}  
 
             return Ok("Réservation ajoutée avec succès");
         }
@@ -157,7 +157,7 @@ namespace RéservationApp.Controllers.ClientControllers
             }
 
             return Ok("Modification de la réservation avec succès");
-        }
+        }*/
     }
     
 }

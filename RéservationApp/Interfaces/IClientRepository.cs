@@ -7,10 +7,11 @@ namespace RéservationApp.Interfaces
         ICollection<Client> GetClients();
         Client GetClient(int id);
         Client GetClient(string nom);
-        decimal GetClientReservation(int FindID);
-        ICollection<Reservation> GetReservations(int IDClient);
-        int GetNombreReservationByClient(int IDClient); 
-        bool ClientExists(int FindID);
+        Client GetClientMail(string mail);
+        decimal GetClientReservation(int ID);
+        ICollection<Reservation> GetReservations(int ID);
+        int GetNombreReservationByClient(int ID); 
+        bool ClientExists(int ID);
         bool CreateClient(Client client);
         bool UpdateClient(Client client);
         bool DeleteClient(Client client);  

@@ -12,34 +12,40 @@ namespace RéservationApp.Data
         
         }
 
+        public DbSet<Aeroport> Aeroports { get; set; }
+        public DbSet<Agent> Agents { get; set; }
+        public DbSet<AvionCargo> AvionCargos { get; set; }
         public DbSet<Client> Clients { get; set; }
-        public DbSet<Vol> Vols { get; set; }
-        public DbSet<Nature_Marchandise> Nature_Marchandises { get; set; }
-        public DbSet<Marchandise> Marchandises { get; set; }
-        public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<Tarif> Tarifs { get; set; }
+        public DbSet<Compagnie> Compagnies { get; set; }
+        public DbSet<CoutFret> CoutFrets { get; set; }
+        public DbSet<Escale> Escales { get; set; }
+        public DbSet<Itineraire> Itineraires { get; set; }
         public DbSet<LTA> LTAs { get; set; }
+        public DbSet<Marchandise> Marchandises { get; set; }
+        public DbSet<Nature_Marchandise> Nature_Marchandises { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<TypeTarif> TypeTarifs { get; set; }        
         public DbSet<Vente> Ventes { get; set; }
-        public DbSet <CoutFret> CoutFrets { get; set; }
-        public DbSet <TypeTarif> TypeTarifs { get; set; }
+        public DbSet<VolCargo> VolCargos { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+
+
+        //lOGIN
         public DbSet<TblMenu> TblMenu { get; set; }
         public  DbSet<TblPermission> TblPermission { get; set; }
         public DbSet<TblRefreshtoken> TblRefreshtoken { get; set; }
         public DbSet<TblRole> TblRole { get; set; }
         public DbSet<TblUser> TblUser { get; set; }
+        public DbSet<Exemple> Exemples { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<LTA>()
-                .HasKey(lt => new { lt.RefReservation, lt.IDTarif });
-            modelBuilder.Entity<LTA>()
-                .HasOne(re => re.Reservation)
-                .WithMany(lt => lt.LTAs)
-                .HasForeignKey(re => re.RefReservation);
-            modelBuilder.Entity<LTA>()
-                .HasOne(tar => tar.Tarif)
-                .WithMany(lt => lt.LTAs)
-                .HasForeignKey(tar => tar.IDTarif);
+
+            //NEW LOGIN
+            
+            modelBuilder.Entity<Client>(entity => {
+            entity.HasIndex(e => e.ClientMail).IsUnique();
+            });
 
             //A propos du login
             modelBuilder.Entity<TblMenu>(entity =>

@@ -1,11 +1,15 @@
-﻿namespace RéservationApp.Dto
+﻿using System.Text.Json.Serialization;
+
+namespace RéservationApp.Dto
 {
     public class ClientDto
     {
-        public int IDClient { get; set; }
-        public string NomClient { get; set; }
-        public string Adresse { get; set; }
-        public string Mail { get; set; }
-        public string Telephone { get; set; }
+        public int id { get; set; }
+        public string ClientNom { get; set; }
+        public string ClientPrenom { get; set; }
+        public string ClientAdresse { get; set; }
+        public string ClientMail { get; set; }
+        public string ClientContact { get; set; }
+        public string ClientMotPasse { get; set; }
     }
 }

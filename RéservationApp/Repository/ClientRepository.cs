@@ -12,9 +12,9 @@ namespace RéservationApp.Repository
             _context = context;
         }
 
-        public bool ClientExists(int FindID)
+        public bool ClientExists(int ID)
         {
-            return _context.Clients.Any(cli => cli.IDClient == FindID);   
+            return _context.Clients.Any(cli => cli.id == ID);   
         }
 
         public bool CreateClient(Client client)
@@ -29,34 +29,40 @@ namespace RéservationApp.Repository
             return Save();
         }
 
-        public Client GetClient(int id)
+        public Client GetClient(int ID)
         {
-            return _context.Clients.Where(cli => cli.IDClient == id).FirstOrDefault();
+            return _context.Clients.Where(cli => cli.id == ID).FirstOrDefault();
         }
 
         public Client GetClient(string nom)
         {
-            return _context.Clients.Where(cli => cli.NomClient == nom).FirstOrDefault();
+            return _context.Clients.Where(cli => cli.ClientNom == nom).FirstOrDefault();
         }
 
-        public decimal GetClientReservation(int FindID)
+
+        public Client GetClientMail(string mail)
         {
-            var reservation = _context.Reservations.Where(cli => cli.Client.IDClient == FindID);
+            return _context.Clients.FirstOrDefault(c => c.ClientMail == mail);
+        }
+
+        public decimal GetClientReservation(int ID)
+        {
+            var reservation = _context.Reservations.Where(cli => cli.Client.id == ID);
 
             if (reservation.Count() <= 0)
                 return 0;
 
-            return (decimal)reservation.Sum(r => r.RefReservation) / reservation.Count();
+            return (decimal)reservation.Sum(r => r.id) / reservation.Count();
         }
 
         public ICollection<Client> GetClients()
         {
-            return _context.Clients.OrderBy(cli => cli.IDClient).ToList();
+            return _context.Clients.OrderBy(cli => cli.ClientNom).ToList();
         }
 
-        public int GetNombreReservationByClient(int IDClient)
+        public int GetNombreReservationByClient(int ID)
         {
-            var reservation = _context.Reservations.Where(res => res.Client.IDClient == IDClient);
+            var reservation = _context.Reservations.Where(res => res.Client.id == ID);
 
             if (reservation.Count() <= 0)
                 return 0;
@@ -64,9 +70,9 @@ namespace RéservationApp.Repository
             return (int)reservation.Count();
         }
 
-        public ICollection<Reservation> GetReservations(int IDClient)
+        public ICollection<Reservation> GetReservations(int ID)
         {
-            return _context.Reservations.Where(res => res.Client.IDClient == IDClient).OrderBy(res => res.RefReservation).ToList();
+            return _context.Reservations.Where(res => res.Client.id == ID).OrderBy(res => res.id).ToList();
         }
 
         public bool Save()

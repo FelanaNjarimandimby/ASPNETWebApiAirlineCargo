@@ -2,12 +2,11 @@
 {
     public class MarchandiseDto
     {
-        public int IDMarchandise { get; set; }
-        public string Designation { get; set; }
-        public int NombreColis { get; set; }
-        public double Poids { get; set; }
-        public double Dimension { get; set; }
-        public string Volume { get; set; }
-        public string Libelle { get; set; }
+        public int id { get; set; }
+        public string MarchandiseDesignation { get; set; }
+        public int MarchandiseNombre { get; set; }
+        public double MarchandisePoids { get; set; }
+        public double MarchandiseVolume { get; set; }
+        public string NatureMarchandiseLibelle { get; set; }
     }
 }

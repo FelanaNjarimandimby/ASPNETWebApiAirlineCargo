@@ -4,17 +4,16 @@ namespace RéservationApp.Dto
 {
     public class ReservationDto
     {
-        public int RefReservation { get; set; }
-        public string NomDestinaire { get; set; }
-        public string AeroportDepart { get; set; }
-        public string AeroportDestination { get; set; }
+        public int id { get; set; }
+        public string NomDestinataire { get; set; }
         public DateTime DateExpeditionSouhaite { get; set; }
-        public string ExigencesSpeciales { get; set; }
-        public string EtatReservation { get; set; }
-        public int IDClient { get; set; }
-        public int IDMarchandise { get; set; }
-        //public MarchandiseDto Marchandise { get; set; }
-        public int NumVol { get; set; }
+        public string ReservationExigences { get; set; }
+        public string ReservationEtat { get; set; }
+        public DateTime ReservationDate { get; set; }
+        public int ClientID { get; set; }
+        public int MarchandiseID { get; set; }
+        public int VolID { get; set; }
+        public int ItineraireID { get; set; }
 
     }
 }

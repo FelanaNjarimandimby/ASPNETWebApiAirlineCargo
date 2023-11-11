@@ -14,11 +14,15 @@ namespace RéservationApp.Controllers
     {
         private readonly INature_MarchandiseRepository _nature_MarchandiseRepository;
         private readonly IMapper _mapper;
+        private readonly ITypeTarifRepository _typeTarifRepository;
 
-        public Nature_MarchandiseController(INature_MarchandiseRepository nature_MarchandiseRepository, IMapper mapper)
+        public Nature_MarchandiseController(INature_MarchandiseRepository nature_MarchandiseRepository, 
+            IMapper mapper,
+            ITypeTarifRepository typeTarifRepository)
         {
             _nature_MarchandiseRepository = nature_MarchandiseRepository;
             _mapper = mapper;
+            _typeTarifRepository = typeTarifRepository;
         }
 
         [HttpGet]
@@ -49,6 +53,22 @@ namespace RéservationApp.Controllers
             return Ok(nature);
         }
 
+        [HttpGet("nature/{natureID}")]
+        [ProducesResponseType(200, Type = typeof(Nature_Marchandise))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetNatureID(int natureID)
+        {
+            var nature = _mapper.Map<Nature_MarchandiseDto>(
+                _nature_MarchandiseRepository.GetNature_Marchandise(natureID));
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(nature);
+        }
+
+
         [HttpGet("{natureID}/marchandises")]
 
         public IActionResult GetMarchandiseFromNature(int natureID)
@@ -75,9 +95,9 @@ namespace RéservationApp.Controllers
                 return BadRequest(ModelState);
 
             var nature = _nature_MarchandiseRepository.GetNature_Marchandises()
-                .Where(nat => nat.Libelle.Trim().ToUpper() == natureCreate.Libelle.TrimEnd().ToUpper())
+                .Where(nat => nat.NatureMarchandiseLibelle.Trim().ToUpper() == natureCreate.NatureMarchandiseLibelle.TrimEnd().ToUpper())
                 .FirstOrDefault();
-
+            
             if (nature != null)
             {
                 ModelState.AddModelError("", "Cette nature de marchandise existe déjà!");
@@ -89,7 +109,14 @@ namespace RéservationApp.Controllers
 
             var natureMap = _mapper.Map<Nature_Marchandise>(natureCreate);
 
-            if(!_nature_MarchandiseRepository.CreateNature_Marchandise(natureMap))
+            natureMap.TypeTarif = _typeTarifRepository.GetTypeTarif(natureCreate.TarifLibelle);
+            if (natureMap.TypeTarif == null)
+            {
+                ModelState.AddModelError("", "Ce type de tarif n'existe pas!");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!_nature_MarchandiseRepository.CreateNature_Marchandise(natureMap))
             {
                 ModelState.AddModelError("", "Le serveur a rencontré un problème");
                 return StatusCode(500, ModelState);
@@ -108,7 +135,7 @@ namespace RéservationApp.Controllers
             if(natureUpdate == null)
                 return BadRequest(ModelState);
 
-            if(natureID != natureUpdate.IDNatureMarchandise)
+            if(natureID != natureUpdate.id)
                 return BadRequest(ModelState);
 
             if(!_nature_MarchandiseRepository.Nature_MarchandiseExists(natureID))
