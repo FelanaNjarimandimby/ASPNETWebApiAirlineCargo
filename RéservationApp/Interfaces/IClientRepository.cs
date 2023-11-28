@@ -10,6 +10,7 @@ namespace RéservationApp.Interfaces
         Client GetClientMail(string mail);
         decimal GetClientReservation(int ID);
         ICollection<Reservation> GetReservations(int ID);
+        ICollection<Client> GetClientByEtat(string etat);
         int GetNombreReservationByClient(int ID); 
         bool ClientExists(int ID);
         bool CreateClient(Client client);

@@ -52,6 +52,19 @@ namespace RéservationApp.Controllers
             return Ok(aeroport);
         }
 
+        [HttpGet("aeroport/{codeiata}")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Aeroport>))]
+
+        public IActionResult Aeroport(string codeiata)
+        {
+            var aeroports = _mapper.Map<AeroportDto>(_aeroportRepository.GetSpecificAeroport(codeiata));
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(aeroports);
+        }
+
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

@@ -38,7 +38,7 @@ namespace RéservationApp.Repository
 
         public CoutFret GetCoutFretID(int ID)
         {
-            return _context.CoutFrets.Include(cf => cf.Agent).Where(c => c.id == ID).FirstOrDefault();
+            return _context.CoutFrets.Include(cf => cf.Agent).Where(c => c.id == ID).OrderBy(c => c.id).FirstOrDefault();
         }
 
         public ICollection<CoutFret> GetCoutFrets()

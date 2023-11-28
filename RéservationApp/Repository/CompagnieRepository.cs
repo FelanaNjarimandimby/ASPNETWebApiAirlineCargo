@@ -32,12 +32,12 @@ namespace RéservationApp.Repository
 
         public Compagnie GetCompagnie(int ID)
         {
-            return _context.Compagnies.Where(a => a.id == ID).FirstOrDefault();
+            return _context.Compagnies.Where(a => a.id == ID).OrderBy(c => c.id).FirstOrDefault();
         }
 
         public ICollection<Compagnie> GetCompagnies()
         {
-            return _context.Compagnies.ToList();
+            return _context.Compagnies.OrderBy(c => c.id).ToList();
         }
 
         public bool Save()

@@ -50,6 +50,21 @@ namespace RéservationApp.Controllers
             return Ok(tarif);
         }
 
+        [HttpGet("Tarif/{MarchandiseID}")]
+        [ProducesResponseType(200, Type = typeof(TypeTarif))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetTypeByMarchandise(int MarchandiseID)
+        {
+
+            var tarif = _mapper.Map<TypeTarifDto>(_typeTarifRepository.GetTarifMarchandise(MarchandiseID));
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(tarif);
+        }
+
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

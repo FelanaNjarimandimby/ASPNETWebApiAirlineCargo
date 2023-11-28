@@ -1,4 +1,5 @@
-﻿using RéservationApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using RéservationApp.Data;
 using RéservationApp.Interfaces;
 using RéservationApp.Models;
 
@@ -31,14 +32,20 @@ namespace RéservationApp.Repository
 
         public Client GetClient(int ID)
         {
-            return _context.Clients.Where(cli => cli.id == ID).FirstOrDefault();
+            return _context.Clients.Where(cli => cli.id == ID).OrderBy(c => c.id).FirstOrDefault();
         }
 
         public Client GetClient(string nom)
         {
-            return _context.Clients.Where(cli => cli.ClientNom == nom).FirstOrDefault();
+            return _context.Clients.Where(cli => cli.ClientNom == nom).OrderBy(c => c.id).FirstOrDefault();
         }
 
+        public ICollection<Client> GetClientByEtat(string etat)
+        {
+            var client = _context.Reservations.Where(r => r.ReservationEtat == etat).Include(r => r.Client).Select(o => o.Client).Distinct().ToList();
+
+            return client;
+        }
 
         public Client GetClientMail(string mail)
         {
@@ -57,7 +64,7 @@ namespace RéservationApp.Repository
 
         public ICollection<Client> GetClients()
         {
-            return _context.Clients.OrderBy(cli => cli.ClientNom).ToList();
+            return _context.Clients.OrderBy(cli => cli.ClientNom).OrderBy(c => c.id).ToList();
         }
 
         public int GetNombreReservationByClient(int ID)

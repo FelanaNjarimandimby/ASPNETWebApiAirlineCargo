@@ -38,7 +38,7 @@ namespace RéservationApp.Repository
                 Include(l => l.Vente.Reservation.VolCargo.AvionCargo).
                 Include(l => l.Vente.Reservation.VolCargo.Aeroport).
                 Include(l => l.Vente.Reservation.VolCargo.Aeroport.Compagnie).
-                Where(l => l.id == ID).FirstOrDefault();
+                Where(l => l.id == ID).OrderBy(l => l.id).FirstOrDefault();
         }
 
         public ICollection<LTA> GetLtas()
@@ -52,7 +52,7 @@ namespace RéservationApp.Repository
                 Include(l => l.Vente.Reservation.VolCargo.Itineraire).
                 Include(l => l.Vente.Reservation.VolCargo.AvionCargo).
                 Include(l => l.Vente.Reservation.VolCargo.Aeroport).
-                Include(l => l.Vente.Reservation.VolCargo.Aeroport.Compagnie).ToList();
+                Include(l => l.Vente.Reservation.VolCargo.Aeroport.Compagnie).OrderBy(l => l.id).ToList();
         }
 
         public bool LtaExists(int ID)

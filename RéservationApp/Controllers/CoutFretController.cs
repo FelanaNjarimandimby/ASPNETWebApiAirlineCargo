@@ -43,7 +43,7 @@ namespace RéservationApp.Controllers
 
         public IActionResult CoutFrets()
         {
-            var coutFrets = _mapper.Map<List<CoutFretDto>>(_coutFretRepository.GetCoutFrets());
+            var coutFrets = _mapper.Map<List<CoutDto>>(_coutFretRepository.GetCoutFrets());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

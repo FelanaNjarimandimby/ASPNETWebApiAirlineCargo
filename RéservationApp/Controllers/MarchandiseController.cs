@@ -17,14 +17,17 @@ namespace RéservationApp.Controllers
     {
         private readonly IMarchandiseRepository _marchandiseRepository;
         private readonly INature_MarchandiseRepository _nature_marchandiseRepository;
+        private readonly DataContext _context;
         private readonly IMapper _mapper;
 
         public MarchandiseController(IMarchandiseRepository marchandiseRepository, 
             INature_MarchandiseRepository nature_MarchandiseRepository,
+            DataContext context,
             IMapper mapper)
         {
             _marchandiseRepository = marchandiseRepository;
             _nature_marchandiseRepository = nature_MarchandiseRepository;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -113,6 +116,7 @@ namespace RéservationApp.Controllers
 
         public IActionResult GetTarifNature(int MarchandiseID)
         {
+            
             if (!_marchandiseRepository.MarchandiseExists(MarchandiseID))
                 return NotFound();
 
@@ -141,6 +145,67 @@ namespace RéservationApp.Controllers
             return Ok(marchandise);
         }
 
+
+        [HttpGet("total")]
+        [ProducesResponseType(200, Type = typeof(decimal))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetTotal()
+        {
+             var marchandise = _marchandiseRepository.TarifTotal();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(marchandise);
+        }
+
+        [HttpGet("totalReserve")]
+        [ProducesResponseType(200, Type = typeof(decimal))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetTotalReserve()
+        {
+            var marchandise = _marchandiseRepository.TarifReserve();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(marchandise);
+        }
+
+        [HttpGet("totalConfirme")]
+        [ProducesResponseType(200, Type = typeof(decimal))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetTotalConfirme()
+        {
+            var marchandise = _marchandiseRepository.TarifConfirme();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(marchandise);
+        }
+
+
+        
+        [HttpGet("marchandiseConfirme")]
+        [ProducesResponseType(200, Type = typeof(decimal))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetMC(string etat)
+        {
+            var marchandise = _marchandiseRepository.GetMarchandiseByEtat(etat);
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(marchandise);
+        }
+
+
+        
         [HttpPost("getID")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -221,6 +286,35 @@ namespace RéservationApp.Controllers
             }
 
             return Ok("Modification de la marchandise avec succès");
+        }
+
+        [HttpDelete("{marchandiseID}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+
+        public IActionResult DeleteMarchandise(int marchandiseID)
+        {
+            try
+            {
+                //var marchandise = _context.Marchandises.Find(marchandiseID);
+                var marchandise = _context.Marchandises.Where(m => m.id == marchandiseID).SingleOrDefault();
+
+                if (marchandise is not null)
+                {
+                    _context.Marchandises.Remove(marchandise);
+
+                    _context.SaveChanges();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Le serveur a rencontré un problème");
+
+            }
+
+            return Ok("Marchandise supprimé avec succès");
         }
 
     }

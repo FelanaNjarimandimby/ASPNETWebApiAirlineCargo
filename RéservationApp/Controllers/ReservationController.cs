@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using RéservationApp.Data;
 using RéservationApp.Dto;
 using RéservationApp.Interfaces;
@@ -117,103 +118,51 @@ namespace RéservationApp.Controllers
             return Ok(reservations);
         }
 
-        [HttpPost]
-        [ProducesResponseType(200)]
+        [HttpGet("confirme")]
+        [ProducesResponseType(200, Type = typeof(Reservation))]
         [ProducesResponseType(400)]
-        
-        public IActionResult CreateReservation([FromBody] ReservationDto reservationCreate)
+
+        public IActionResult GetReservationsConfirme()
         {
-            if(reservationCreate == null)
-                return BadRequest(ModelState);
-
-            var reservation = _reservationRespository.GetReservations()
-            .Where(res => res.NomDestinataire.Trim().ToUpper() == reservationCreate.NomDestinataire.TrimEnd().ToUpper()
-            && res.DateExpeditionSouhaite == reservationCreate.DateExpeditionSouhaite 
-            && res.ReservationExigences.Trim().ToUpper() == reservationCreate.ReservationExigences.TrimEnd().ToUpper()
-            && res.ReservationEtat.Trim().ToUpper() == reservationCreate.ReservationEtat.ToUpper()
-            && res.ReservationDate == reservationCreate.ReservationDate
-            && res.Client.id == reservationCreate.ClientID
-            && res.Marchandise.id == reservationCreate.MarchandiseID
-            && res.VolCargo.id == reservationCreate.VolID)
-            .FirstOrDefault();
-
-            if(reservation != null)
-            {
-                ModelState.AddModelError("", "Réservation existe déjà!");
-                return StatusCode(422, ModelState);
-            }
+            var reservations = _mapper.Map<List<ReservationClientDto>>(_reservationRespository.GetReservationByEtat("Confirmé"));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-
-            var getvol = _volCargoRepository.GetVolCargos().Where(
-             v => v.Itineraire.id == reservationCreate.ItineraireID)
-              .FirstOrDefault();
-
-            var itineraire = _itineraireRepository.GetItineraire(reservationCreate.ItineraireID);
-            var vol = _volCargoRepository.GetVolByItineraire(itineraire.id);
-            var marchandise = _marchandiseRepository.GetMarchandise(reservationCreate.MarchandiseID);
-            var client = _clientRepository.GetClient(reservationCreate.ClientID);
-
-            var reservationMap = new Reservation
-            {
-                NomDestinataire = reservationCreate.NomDestinataire,
-                DateExpeditionSouhaite = reservationCreate.DateExpeditionSouhaite,
-                ReservationExigences = reservationCreate.ReservationExigences,
-                ReservationEtat = "Reservé",
-                ReservationDate = reservationCreate.ReservationDate,
-                Itineraire = itineraire,
-                VolCargo = vol,
-                Marchandise = marchandise,
-                Client = client,
-            };
-
-            //Récuperation du client
-
-            if (!_clientRepository.ClientExists(reservationCreate.ClientID))
-            {
-                ModelState.AddModelError("", "Ce client existe pas!");
-                return StatusCode(422, ModelState);
-            }
-
-
-            //Récuperation de la marchandise
-
-            if (!_marchandiseRepository.MarchandiseExists(reservationCreate.MarchandiseID))
-            {
-                ModelState.AddModelError("", "Cette marchandise existe pas!");
-                return StatusCode(422, ModelState);
-            }
-
-            //Récuperation du vol
-            if (vol == null)
-            {
-                ModelState.AddModelError("", "Pas de vol disponible pour votre itinéraire!");
-                return StatusCode(422, ModelState);
-            }
-
-            //Récuperation du vol
-            if (!_itineraireRepository.ItineraireExists(reservationCreate.ItineraireID))
-            {
-                ModelState.AddModelError("", "Cet itinéraire existe pas!");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!_reservationRespository.CreateReservation(reservationMap))
-            {
-                ModelState.AddModelError("", "Le serveur a rencontré un problème");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Réservation ajoutée avec succès");
-
-
-
-
-
-
+            return Ok(reservations);
         }
+
+        [HttpGet("reserve")]
+        [ProducesResponseType(200, Type = typeof(Reservation))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetReservationsReserve()
+        {
+            var reservations = _mapper.Map<List<ReservationClientDto>>(_reservationRespository.GetReservationByEtat("Reservé"));
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(reservations);
+        }
+
+        [HttpGet("reservationNonConfirme")]
+        [ProducesResponseType(200, Type = typeof(Reservation))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetReservationNonConfirme()
+        {
+            var reservationByNotification = _mapper.Map<List<ReservationDto>>(_reservationRespository.GetReservationByVue("Oui"));
+
+            var reservationMap = reservationByNotification.Where(r => r.ReservationEtat == "Reservé");
+            
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(reservationMap);
+        }
+        
 
         [HttpPost("ClientReservation")]
         [ProducesResponseType(200)]
@@ -229,13 +178,6 @@ namespace RéservationApp.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-
-
-
-
-            /*var getvol = _volCargoRepository.GetVolCargos().Where(
-             v => v.Itineraire.id == reservationCreate.ItineraireID)
-              .FirstOrDefault();*/
 
             var itineraire = _itineraireRepository.GetItineraire(reservationCreate.ItineraireDepart, reservationCreate.ItineraireArrive);
             var vol = _volCargoRepository.GetVolByItineraire(itineraire.id);
@@ -270,7 +212,7 @@ namespace RéservationApp.Controllers
                 DateExpeditionSouhaite = reservationCreate.DateExpeditionSouhaite,
                 ReservationExigences = reservationCreate.ReservationExigences,
                 ReservationEtat = "Reservé",
-                ReservationDate = reservationCreate.ReservationDate,
+                ReservationDate = DateTime.UtcNow,
                 Itineraire = itineraire,
                 VolCargo = vol,
                 Marchandise = marchandise,
@@ -284,8 +226,6 @@ namespace RéservationApp.Controllers
                 ModelState.AddModelError("", "Ce client existe pas!");
                 return StatusCode(422, ModelState);
             }
-
-
 
             //Récuperation du vol
             if (vol == null)
@@ -301,11 +241,6 @@ namespace RéservationApp.Controllers
             }
 
             return Ok("Réservation ajoutée avec succès");
-
-
-
-
-
 
         }
 
@@ -344,7 +279,7 @@ namespace RéservationApp.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
 
-        public IActionResult UpdateConfirmReservation(int reservationID, [FromBody] ReservationDto reservationUpdate)
+        public IActionResult UpdateConfirmReservation(int reservationID, [FromBody] ReservationClientDto reservationUpdate)
         {
             if (reservationUpdate == null)
                 return BadRequest(ModelState);
@@ -363,16 +298,37 @@ namespace RéservationApp.Controllers
             var reservation = _reservationClientRepository.GetReservations().Where(
             c => c.id == reservationID).FirstOrDefault();
 
+            var marchandise = reservation.Marchandise;
+
+            if (marchandise != null)
+            {
+                marchandise.MarchandiseDesignation = reservationUpdate.Designation;
+                marchandise.MarchandiseNombre = reservationUpdate.NombreColis;
+                marchandise.MarchandisePoids = reservationUpdate.Poids;
+                marchandise.MarchandiseVolume = reservationUpdate.Volume;
+                marchandise.Nature_Marchandise.NatureMarchandiseLibelle = reservationUpdate.Nature;
+
+                _context.SaveChanges();
+
+            };
+
+            var itineraire = reservation.Itineraire;
+
+
+
+
+            var vol = _volCargoRepository.GetVolByItineraire(itineraire.id);
+
             if (reservation != null)
             {
-                reservation.NomDestinataire = reservation.NomDestinataire;
-                reservation.ReservationExigences = reservation.ReservationExigences;
-                reservation.DateExpeditionSouhaite = reservation.DateExpeditionSouhaite;
-                reservation.ReservationEtat = "Confirmé";
+                reservation.NomDestinataire = reservationUpdate.NomDestinataire;
+                reservation.ReservationExigences = reservationUpdate.ReservationExigences;
+                reservation.DateExpeditionSouhaite = reservationUpdate.DateExpeditionSouhaite;
+                reservation.ReservationEtat = reservationUpdate.ReservationEtat;
                 reservation.ReservationDate = reservation.ReservationDate;
-                reservation.Itineraire = reservation.Itineraire;
-                reservation.VolCargo = reservation.VolCargo;
-                reservation.Marchandise = reservation.Marchandise;
+                reservation.Itineraire = itineraire;
+                reservation.VolCargo = vol;
+                reservation.Marchandise = marchandise;
                 reservation.Client = reservation.Client;
 
                 _context.SaveChanges();
@@ -381,6 +337,8 @@ namespace RéservationApp.Controllers
 
 
             return Ok("Modification de la réservation avec succès");
+
+
         }
 
         [HttpPut("Modifier/{reservationID}")]
@@ -423,14 +381,7 @@ namespace RéservationApp.Controllers
 
             var itineraire = reservation.Itineraire;
 
-            if (itineraire != null)
-            {
-                itineraire.ItineraireDepart = reservationUpdate.ItineraireDepart;
-                itineraire.ItineraireArrive = reservationUpdate.ItineraireArrive;
 
-                _context.SaveChanges();
-
-            };
 
 
             var vol = _volCargoRepository.GetVolByItineraire(itineraire.id);
@@ -441,7 +392,7 @@ namespace RéservationApp.Controllers
                 reservation.ReservationExigences = reservationUpdate.ReservationExigences;
                 reservation.DateExpeditionSouhaite = reservationUpdate.DateExpeditionSouhaite;
                 reservation.ReservationEtat = "Reservé";
-                reservation.ReservationDate = reservationUpdate.ReservationDate;
+                reservation.ReservationDate = reservation.ReservationDate;
                 reservation.Itineraire = itineraire;
                 reservation.VolCargo = vol;
                 reservation.Marchandise = marchandise;
@@ -453,6 +404,7 @@ namespace RéservationApp.Controllers
 
 
             return Ok("Modification de la réservation avec succès");
+
         }
 
         [HttpDelete("{reservationID}")]

@@ -32,7 +32,7 @@ namespace RéservationApp.Controllers
         
         public IActionResult GetVentes()
         {
-            var ventes = _mapper.Map<List<VenteDto>>(_venteRepository.GetVentes());
+            var ventes = _mapper.Map<List<VenteCargoDto>>(_venteRepository.GetVentes());
 
             if(!ModelState.IsValid) 
                 return BadRequest(ModelState);

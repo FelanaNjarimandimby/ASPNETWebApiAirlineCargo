@@ -13,7 +13,14 @@ namespace RéservationApp.Interfaces
         //Récupérer Valeur de cout de fret selon poidTaxation
         string GetValeur(int MarchandiseID);
 
-    //    ICollection<CoutFret> GetCoutByID(int MarchandiseID);
+        //    ICollection<CoutFret> GetCoutByID(int MarchandiseID);
+
+        decimal TarifTotal();
+        decimal TarifConfirme();
+        decimal TarifReserve();
+
+        ICollection<Marchandise> GetMarchandiseByEtat(string etat);
+        ICollection<Marchandise> GetMarchandiseByiDReservation(int id);
 
         double GetTarifBase(int MarchandiseID);
         double GetTarif(int MarchandiseID);

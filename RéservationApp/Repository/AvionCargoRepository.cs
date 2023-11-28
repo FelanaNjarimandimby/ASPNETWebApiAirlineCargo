@@ -34,8 +34,13 @@ namespace RéservationApp.Repository
             return _context.AvionCargos.Where(a => a.id == ID).FirstOrDefault();
         }
 
-        public ICollection<AvionCargo> GetAvionCargos()
+        public AvionCargo GetAvion(string modele)
         {
+            return _context.AvionCargos.Where(a => a.AvionModele == modele).FirstOrDefault();
+        }
+
+        public ICollection<AvionCargo> GetAvionCargos()
+        { 
             return _context.AvionCargos.ToList();
         }
 

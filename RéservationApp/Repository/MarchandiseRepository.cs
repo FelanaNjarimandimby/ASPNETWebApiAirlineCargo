@@ -12,16 +12,19 @@ namespace RéservationApp.Repository
         private readonly INature_MarchandiseRepository _nature_MarchandiseRepository;
         private readonly ICoutFretRepository _coutFretRepository;
         private readonly ITypeTarifRepository _typeTarifRepository;
+        private readonly IReservationRepository _reservationRepository;
 
         public MarchandiseRepository(DataContext context, 
             INature_MarchandiseRepository nature_MarchandiseRepository,
             ICoutFretRepository coutFretRepository,
-            ITypeTarifRepository typeTarifRepository)
+            ITypeTarifRepository typeTarifRepository,
+            IReservationRepository reservationRepository)
         {
             _context = context;
             _nature_MarchandiseRepository = nature_MarchandiseRepository;
             _coutFretRepository = coutFretRepository;
             _typeTarifRepository = typeTarifRepository;
+            _reservationRepository = reservationRepository;
         }
 
         public bool CreateMarchandise(Marchandise marchandise)
@@ -32,7 +35,7 @@ namespace RéservationApp.Repository
 
         public Marchandise GetMarchandise(int ID)
         {
-            return _context.Marchandises.Where(mar => mar.id == ID).FirstOrDefault();
+            return _context.Marchandises.Where(mar => mar.id == ID).OrderBy(m => m.id).FirstOrDefault();
         }
 
         public Marchandise GetMarchandise(double Poids)
@@ -42,7 +45,7 @@ namespace RéservationApp.Repository
 
         public ICollection<Marchandise> GetMarchandises()
         {
-            return _context.Marchandises.Include(mar => mar.Nature_Marchandise).ToList();
+            return _context.Marchandises.Include(mar => mar.Nature_Marchandise).OrderBy(m => m.id).ToList();
         }
 
         public double GetPoidsTaxation(int MarchandiseID)
@@ -69,7 +72,15 @@ namespace RéservationApp.Repository
         {
             var poidsTaxation = this.GetPoidsTaxation(MarchandiseID);
             var poidsFret = _coutFretRepository.GetCoutFret(poidsTaxation);
-            var tarifBase = poidsFret.Cout * poidsTaxation;
+
+            var marchandise = this.GetMarchandises().Where(m => m.id == MarchandiseID).FirstOrDefault();
+            var natureID = marchandise.Nature_Marchandise.id;
+            var nature = _nature_MarchandiseRepository.GetNature_Marchandises().Where(c => c.id.Equals(natureID)).FirstOrDefault();
+            var typeTarifID = nature.TypeTarif.id;
+            var typeTarif = _typeTarifRepository.GetTypeTarifs().Where(t => t.id == typeTarifID).FirstOrDefault();
+            var valeur = typeTarif.TarifValeur;
+
+            var tarifBase = (poidsFret.Cout * poidsTaxation *  valeur)/100;
 
             return tarifBase;
         }
@@ -167,6 +178,93 @@ namespace RéservationApp.Repository
         {
             return _context.Marchandises.Where(mar => mar.id == MarchandiseID).Select(n => n.Nature_Marchandise).ToList();   
         }
+
+        public decimal TarifTotal()
+        {
+            var marchandisesIds = GetMarchandises().Select(m => m.id).ToList();
+
+            if (marchandisesIds == null || marchandisesIds.Count == 0)
+            {
+                return 0;
+            }
+
+            decimal totalTarif = 0;
+
+            foreach (var marchandiseId in marchandisesIds)
+            {
+                // Faites quelque chose avec marchandiseId, par exemple, imprimez-le
+                Console.WriteLine(GetTarif(marchandiseId));
+
+                // Ajoutez le tarif au total
+                totalTarif += (decimal)(GetTarif(marchandiseId));
+            }
+
+            return totalTarif;
+        }
+
+        public ICollection<Marchandise> GetMarchandiseByEtat(string etat)
+        {
+            
+            var marchandise = _context.Reservations.Where(r => r.ReservationEtat == etat).Include(r => r.Marchandise).Select(o => o.Marchandise).ToList();
+
+            return marchandise;
+        }
+
+        public decimal TarifConfirme()
+        {
+            var marchandisesIds = GetMarchandiseByEtat("Confirmé").Select(m => m.id).ToList();
+
+            if (marchandisesIds == null || marchandisesIds.Count == 0)
+            {
+                return 0;
+            }
+
+            decimal totalTarif = 0;
+
+            foreach (var marchandiseId in marchandisesIds)
+            {
+                // Faites quelque chose avec marchandiseId, par exemple, imprimez-le
+                Console.WriteLine(GetTarif(marchandiseId));
+
+                // Ajoutez le tarif au total
+                totalTarif += (decimal)(GetTarif(marchandiseId));
+            }
+
+            return totalTarif;
+        }
+
+        public decimal TarifReserve()
+        {
+            var marchandisesIds = GetMarchandiseByEtat("Reservé").Select(m => m.id).ToList();
+
+            if (marchandisesIds == null || marchandisesIds.Count == 0)
+            {
+                return 0;
+            }
+
+            decimal totalTarif = 0;
+
+            foreach (var marchandiseId in marchandisesIds)
+            {
+                // Faites quelque chose avec marchandiseId, par exemple, imprimez-le
+                Console.WriteLine(GetTarif(marchandiseId));
+
+                // Ajoutez le tarif au total
+                totalTarif += (decimal)(GetTarif(marchandiseId));
+            }
+
+            return totalTarif;
+        }
+
+        public ICollection<Marchandise> GetMarchandiseByiDReservation(int id)
+        {
+            var marchandise = _context.Reservations.Where(r => r.id == id).Include(r => r.Marchandise).Select(o => o.Marchandise).ToList();
+
+            return marchandise;
+        }
+
+
+
 
 
 

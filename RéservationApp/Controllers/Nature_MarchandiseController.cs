@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RéservationApp.Data;
 using RéservationApp.Dto;
 using RéservationApp.Interfaces;
+using RéservationApp.Migrations;
 using RéservationApp.Models;
 using RéservationApp.Repository;
 
@@ -15,14 +18,17 @@ namespace RéservationApp.Controllers
         private readonly INature_MarchandiseRepository _nature_MarchandiseRepository;
         private readonly IMapper _mapper;
         private readonly ITypeTarifRepository _typeTarifRepository;
+        private readonly DataContext _context;
 
         public Nature_MarchandiseController(INature_MarchandiseRepository nature_MarchandiseRepository, 
             IMapper mapper,
-            ITypeTarifRepository typeTarifRepository)
+            ITypeTarifRepository typeTarifRepository,
+            DataContext context )
         {
             _nature_MarchandiseRepository = nature_MarchandiseRepository;
             _mapper = mapper;
             _typeTarifRepository = typeTarifRepository;
+            _context = context;
         }
 
         [HttpGet]
@@ -144,15 +150,43 @@ namespace RéservationApp.Controllers
             if (!ModelState.IsValid) 
                 return BadRequest();
 
-            var natureMap = _mapper.Map<Nature_Marchandise>(natureUpdate);
+ 
+            //var nature = _nature_MarchandiseRepository.GetNature_Marchandise(natureID);
+            var nature = _context.Nature_Marchandises.Find(natureID);
+            var typetarif = _typeTarifRepository.GetTypeTarif(natureUpdate.TarifLibelle);
 
-            if(!_nature_MarchandiseRepository.UpdateNature_Marchandise(natureMap))
+            if (nature != null)
             {
-                ModelState.AddModelError("", "Le serveur a rencontré un problème");
-                return StatusCode(500, ModelState);
-            }
+                nature.NatureMarchandiseLibelle = natureUpdate.NatureMarchandiseLibelle;
+                nature.TypeTarif = typetarif;
+
+                _context.SaveChanges();
+
+            };
 
             return Ok("Modification de la nature de la marchandise avec succès");
+        }
+
+        [HttpDelete("{natureID}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+
+        public IActionResult DeleteNature(int natureID)
+        {
+            if (!_nature_MarchandiseRepository.Nature_MarchandiseExists(natureID))
+                return NotFound();
+
+            var natureDelete = _nature_MarchandiseRepository.GetNature_Marchandise(natureID);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_nature_MarchandiseRepository.DeleteNature_Marchandise(natureDelete))
+            {
+                ModelState.AddModelError("", "Le serveur a rencontré un problème");
+            }
+
+            return Ok("Nature supprimé avec succès");
         }
 
     }

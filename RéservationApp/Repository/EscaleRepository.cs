@@ -33,12 +33,12 @@ namespace RéservationApp.Repository
 
         public Escale GetEscaleID(int ID)
         {
-            return _context.Escales.Include(e => e.VolCargo).Where(e => e.id == ID).FirstOrDefault();
+            return _context.Escales.Include(e => e.VolCargo).Where(e => e.id == ID).OrderBy(e => e.id).FirstOrDefault();
         }
 
         public ICollection<Escale> GetEscales()
         {
-            return _context.Escales.Include(e => e.VolCargo).OrderBy(c => c.id).ToList();
+            return _context.Escales.Include(e => e.VolCargo).OrderBy(e => e.id).ToList();
         }
 
         public bool Save()

@@ -22,6 +22,12 @@ namespace RéservationApp.Repository
             return Save();
         }
 
+        public bool DeleteNature_Marchandise(Nature_Marchandise nature_marchandise)
+        {
+            _context.Remove(nature_marchandise);
+            return Save();
+        }
+
         public ICollection<Marchandise> GetMarchandiseFromNature(int natureID)
         {
             return _context.Marchandises.Where(nat => nat.Nature_Marchandise.id == natureID).ToList();
@@ -29,23 +35,25 @@ namespace RéservationApp.Repository
 
         public Nature_Marchandise GetNature(string Libelle)
         {
-            return _context.Nature_Marchandises.Where(nat => nat.NatureMarchandiseLibelle == Libelle).FirstOrDefault();
+            return _context.Nature_Marchandises.Where(nat => nat.NatureMarchandiseLibelle == Libelle).OrderBy(n => n.id).FirstOrDefault();
         }
 
         public Nature_Marchandise GetNature_Marchandise(int ID)
         {
-            return _context.Nature_Marchandises.Include(nat => nat.TypeTarif).Where(nat => nat.id == ID).FirstOrDefault();
+            return _context.Nature_Marchandises.Include(nat => nat.TypeTarif).Where(nat => nat.id == ID).OrderBy(n => n.id).FirstOrDefault();
         }
 
         public Nature_Marchandise GetNature_MarchandiseByMarchandise(int MarchandiseID)
         {
-            return _context.Marchandises.Where(mar => mar.id == MarchandiseID).Select(nat => nat.Nature_Marchandise).FirstOrDefault();
+            return _context.Marchandises.Where(mar => mar.id == MarchandiseID).Select(nat => nat.Nature_Marchandise).OrderBy(n => n.id).FirstOrDefault();
         }
 
         public ICollection<Nature_Marchandise> GetNature_Marchandises()
         {
-            return _context.Nature_Marchandises.Include(nat => nat.TypeTarif).ToList();
+            return _context.Nature_Marchandises.Include(nat => nat.TypeTarif).OrderBy(n => n.id).ToList();
         }
+
+        
 
         public bool Nature_MarchandiseExists(int ID)
         {

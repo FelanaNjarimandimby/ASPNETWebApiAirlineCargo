@@ -22,7 +22,7 @@ namespace RéservationApp.Repository
 
         public VolCargo GetVolCargo(int VolID)
         {
-            return _context.VolCargos.Include(v => v.AvionCargo).Include(v => v.Aeroport).Include(v => v.Itineraire).Where(v => v.id == VolID ).FirstOrDefault();
+            return _context.VolCargos.Include(v => v.AvionCargo).Include(v => v.Aeroport).Include(v => v.Itineraire).Where(v => v.id == VolID ).OrderBy(v => v.id).FirstOrDefault();
         }
 
         public VolCargo GetVolByReservation(int ReservationID)
@@ -32,7 +32,7 @@ namespace RéservationApp.Repository
 
         public ICollection<VolCargo> GetVolCargos()
         {
-            return _context.VolCargos.Include(v => v.AvionCargo).Include(v => v.Aeroport).Include(v => v.Itineraire).ToList();
+            return _context.VolCargos.Include(v => v.AvionCargo).Include(v => v.Aeroport).Include(v => v.Itineraire).OrderBy(v => v.id).ToList();
         }
 
         public bool Save()

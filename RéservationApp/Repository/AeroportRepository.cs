@@ -31,6 +31,12 @@ namespace RéservationApp.Repository
             return Save();
         }
 
+        public Aeroport GetAeroport(string codeiata, string codeoaci, string nom)
+        {
+            return _context.Aeroports.Where(a => a.AeroportCodeIATA == codeiata && a.AeroportCodeOACI == codeoaci 
+            && a.AeroportNom == nom ).FirstOrDefault();
+        }
+
         public Aeroport GetAeroportID(int ID)
         {
             return _context.Aeroports.Include(a => a.Compagnie).Where(a => a.id == ID).FirstOrDefault();
@@ -39,6 +45,11 @@ namespace RéservationApp.Repository
         public ICollection<Aeroport> GetAeroports()
         {
             return _context.Aeroports.Include(a => a.Compagnie).OrderBy(c => c.id).ToList();
+        }
+
+        public Aeroport GetSpecificAeroport(string codeiata)
+        {
+            return _context.Aeroports.Where(a => a.AeroportCodeIATA == codeiata).FirstOrDefault();
         }
 
         public bool Save()

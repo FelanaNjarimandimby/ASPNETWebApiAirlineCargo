@@ -31,7 +31,7 @@ namespace RéservationApp.Repository
             return _context.Reservations.Include(res => res.Client).Include(res => res.Marchandise).
                 Include(res => res.Marchandise.Nature_Marchandise).
                 Include(res => res.Marchandise.Nature_Marchandise.TypeTarif).
-                Include(res => res.VolCargo).Include(res => res.Itineraire).ToList();
+                Include(res => res.VolCargo).Include(res => res.Itineraire).OrderBy(res => res.id).ToList();
         }
 
         public ICollection<Reservation> GetReservationsofClient(int ID)
@@ -39,7 +39,7 @@ namespace RéservationApp.Repository
             return _context.Reservations.Include(res => res.Client).Include(res => res.Marchandise).
                 Include(res => res.Marchandise.Nature_Marchandise).
                 Include(res => res.Marchandise.Nature_Marchandise.TypeTarif).
-                Include(res => res.VolCargo).Include(res => res.Itineraire).Where(res => res.Client.id == ID).ToList();
+                Include(res => res.VolCargo).Include(res => res.Itineraire).Where(res => res.Client.id == ID).OrderBy(res => res.id).ToList();
         }
 
         public decimal GetTarifReservation(int ReservationID)
@@ -64,5 +64,11 @@ namespace RéservationApp.Repository
             return Save();
         }
 
+        public ICollection<Reservation> GetReservationByID(int ID)
+        {
+            return _context.Reservations.Include(res => res.Client).Include(res => res.Marchandise).
+            Include(res => res.VolCargo).Include(res => res.Itineraire)
+            .Where(res => res.id == ID).ToList();
+        }
     }
 }

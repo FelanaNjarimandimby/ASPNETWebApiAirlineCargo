@@ -29,28 +29,28 @@ namespace RéservationApp.Repository
 
         public Itineraire GetItineraire(int ID)
         {
-            return _context.Itineraires.Where(i => i.id== ID).FirstOrDefault();
+            return _context.Itineraires.Where(i => i.id== ID).OrderBy(i => i.id).FirstOrDefault();
         }
 
         public Itineraire GetItineraire(string depart, string arrive)
         {
-            return _context.Itineraires.Where(i => i.ItineraireDepart == depart && i.ItineraireArrive == arrive).FirstOrDefault();
+            return _context.Itineraires.Where(i => i.ItineraireDepart == depart && i.ItineraireArrive == arrive).OrderBy(i => i.id).FirstOrDefault();
         }
 
         public ICollection<Itineraire> GetItineraires()
         {
-            return _context.Itineraires.ToList();
+            return _context.Itineraires.OrderBy(i => i.id).OrderBy(i => i.id).ToList();
         }
 
         public ICollection<Itineraire> GetItinerairesInVol()
         {
             var vols = _volCargoRepository.GetVolCargos().FirstOrDefault();
-            return _context.Itineraires.Where(i => i.id == vols.Itineraire.id).ToList();
+            return _context.Itineraires.Where(i => i.id == vols.Itineraire.id).OrderBy(i => i.id).ToList();
         }
 
         public ICollection<Itineraire> GetSpecificItineraire(string depart)
         {
-            return _context.Itineraires.Where(i => i.ItineraireDepart == depart).ToList();
+            return _context.Itineraires.Where(i => i.ItineraireDepart == depart).Distinct().OrderBy(i => i.id).ToList();
         }
 
         public bool ItineraireExists(int ID)

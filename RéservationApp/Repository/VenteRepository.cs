@@ -28,7 +28,7 @@ namespace RéservationApp.Repository
 
         public Vente GetVente(int VenteID)
         {
-            return _context.Ventes.Include(v => v.Reservation).Include(v => v.Agent).Where(v => v.id == VenteID).FirstOrDefault();
+            return _context.Ventes.Include(v => v.Reservation).Include(v => v.Agent).Where(v => v.id == VenteID).OrderBy(v => v.id).FirstOrDefault();
         }
 
         public ICollection<Vente> GetVentes()

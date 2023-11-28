@@ -29,19 +29,19 @@ namespace RéservationApp.Repository
         public ICollection<Notification> GetAllNotification(string vue)
         {
             return _context.Notifications.Include(n => n.Reservation).Include(n => n.Client).
-                Where(n => n.Vue == vue).ToList();
+                Where(n => n.Vue == vue).OrderBy(n => n.id).ToList();
         }
 
         public Notification GetNotification(int reservation)
         {
             return _context.Notifications.Include(n => n.Reservation).Include(n => n.Client)
-                .Where(n => n.Reservation.id == reservation).FirstOrDefault();
+                .Where(n => n.Reservation.id == reservation).OrderBy(n => n.id).FirstOrDefault();
         }
 
         public Notification GetNotificationID(int ID)
         {
             return _context.Notifications.Include(n => n.Reservation).Include(n => n.Client)
-                .Where(n => n.id == ID).FirstOrDefault();
+                .Where(n => n.id == ID).OrderBy(n => n.id).FirstOrDefault();
         }
 
         public Notification GetNotificationNom(string Nom)

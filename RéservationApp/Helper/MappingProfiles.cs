@@ -55,10 +55,18 @@ namespace RéservationApp.Helper
             CreateMap<MarchandiseDto, Marchandise>();
             CreateMap<Nature_Marchandise, Nature_MarchandiseDto>().ForMember(d => d.TarifLibelle, a => a.MapFrom(s => s.TypeTarif.TarifLibelle));
             CreateMap<Nature_MarchandiseDto, Nature_Marchandise>();
-            CreateMap<Reservation, ReservationDto>().ForMember(d => d.ClientID, a => a.MapFrom(s => s.Client.id)).
-                ForMember(d => d.MarchandiseID, a => a.MapFrom(s => s.Marchandise.id)).
+            CreateMap<Reservation, ReservationDto>().ForMember(d => d.ClientID, a => a.MapFrom(s => s.Client.id))
+                .ForMember(d => d.ClientNom, a => a.MapFrom(s => s.Client.ClientNom)).
+                ForMember(d => d.Designation, a => a.MapFrom(s => s.Marchandise.MarchandiseDesignation)).
+                ForMember(d => d.NombreColis, a => a.MapFrom(s => s.Marchandise.MarchandiseNombre)).
+                ForMember(d => d.Poids, a => a.MapFrom(s => s.Marchandise.MarchandisePoids)).
+                ForMember(d => d.Volume, a => a.MapFrom(s => s.Marchandise.MarchandiseVolume)).
+                ForMember(d => d.Nature, a => a.MapFrom(s => s.Marchandise.Nature_Marchandise.NatureMarchandiseLibelle)).
+                ForMember(d => d.Tarif, a => a.MapFrom(s => s.Marchandise.Nature_Marchandise.TypeTarif.TarifLibelle)).
                 ForMember(d => d.VolID, a => a.MapFrom(s => s.VolCargo.id)).
-                ForMember(d => d.ItineraireID, a => a.MapFrom(s => s.Itineraire.id));
+                ForMember(d => d.VolNumero, a => a.MapFrom(s => s.VolCargo.VolNumero)).
+                ForMember(d => d.ItineraireDepart, a => a.MapFrom(s => s.Itineraire.ItineraireDepart)).
+                ForMember(d => d.ItineraireArrive, a => a.MapFrom(s => s.Itineraire.ItineraireArrive));
             CreateMap<ReservationDto, Reservation>();
             CreateMap<TypeTarif, TypeTarifDto>();
             CreateMap<TypeTarifDto, TypeTarif>();
@@ -86,7 +94,25 @@ namespace RéservationApp.Helper
     .ForMember(d => d.ClientNom, a => a.MapFrom(s => s.Client.ClientNom))
     .ForMember(d => d.ClientID, a => a.MapFrom(s => s.Client.id)); ;
             CreateMap<NotificationDto, Notification>();
-            
+
+            CreateMap<CoutFret, CoutDto>().ForMember(d => d.AgentNom, a => a.MapFrom(s => s.Agent.AgentNom));
+            CreateMap<CoutDto, CoutFret>();
+
+            CreateMap<TypeTarif, TarifChartDto>();
+            CreateMap<TarifChartDto, TypeTarif>();
+
+            CreateMap<Vente, VenteCargoDto>().ForMember(d => d.ReservationID, a => a.MapFrom(s => s.Reservation.id))
+    .ForMember(d => d.AgentNom, a => a.MapFrom(s => s.Agent.AgentNom));
+            CreateMap<VenteCargoDto, Vente>();
+
+            CreateMap<VolCargo, VolDto>().ForMember(d => d.AvionModele, a => a.MapFrom(s => s.AvionCargo.AvionModele))
+                .ForMember(d => d.AeroportCodeIATA, a => a.MapFrom(s => s.Aeroport.AeroportCodeIATA))
+                .ForMember(d => d.AeroportCodeOACI, a => a.MapFrom(s => s.Aeroport.AeroportCodeOACI))
+                .ForMember(d => d.AeroportNom, a => a.MapFrom(s => s.Aeroport.AeroportNom))
+                .ForMember(d => d.ItineraireDepart, a => a.MapFrom(s => s.Itineraire.ItineraireDepart))
+                .ForMember(d => d.ItineraireArrive, a => a.MapFrom(s => s.Itineraire.ItineraireArrive));
+            CreateMap<VolDto, VolCargo>();
+
             /**/
         }
     }

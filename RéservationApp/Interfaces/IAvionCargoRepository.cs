@@ -6,6 +6,7 @@ namespace RéservationApp.Interfaces
     {
         ICollection<AvionCargo> GetAvionCargos();
         AvionCargo GetAvion(int ID);
+        AvionCargo GetAvion(string modele);
         bool AvionExists(int ID);
         bool CreateAvion(AvionCargo avion);
         bool UpdateAvion(AvionCargo avion);

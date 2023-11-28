@@ -6,6 +6,8 @@ namespace RéservationApp.Interfaces
     {
         ICollection<Aeroport> GetAeroports();
         Aeroport GetAeroportID(int ID);
+        Aeroport GetAeroport(string codeiata, string codeoaci, string nom);
+        Aeroport GetSpecificAeroport(string codeiata);
         bool AeroportExists(int ID);
         bool CreateAeroport(Aeroport aeroport);
         bool UpdateAeroport(Aeroport aeroport);

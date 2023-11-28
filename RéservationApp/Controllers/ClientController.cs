@@ -7,6 +7,7 @@ using RéservationApp.Dto;
 using RéservationApp.Helper;
 using RéservationApp.Interfaces;
 using RéservationApp.Models;
+using RéservationApp.Repository;
 
 namespace RéservationApp.Controllers
 {
@@ -116,6 +117,20 @@ namespace RéservationApp.Controllers
             return Ok(reservation);
         }
 
+        [HttpGet("ClientConfirme")]
+        [ProducesResponseType(200, Type = typeof(decimal))]
+        [ProducesResponseType(400)]
+
+        public IActionResult GetCLT(string etat)
+        {
+            var client = _clientRepository.GetClientByEtat(etat);
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok(client);
+        }
+
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -188,7 +203,15 @@ namespace RéservationApp.Controllers
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("jwt");
+            var jwt = Request.Cookies["jwt"];
+
+            var token = _jwtService.Verify(jwt);
+
+            int userId = int.Parse(token.Issuer);
+
+            string cookieKey = $"jwt_{userId}";
+
+            Response.Cookies.Delete(cookieKey);
 
             return Ok(new
             {
@@ -232,12 +255,43 @@ namespace RéservationApp.Controllers
 
             };
 
-/*
-            if (!_clientRepository.UpdateClient(clientMap))
+            return Ok("Modification du client avec succès");
+        }
+
+        [HttpPut("Modifier/{clientID}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+
+        public IActionResult UpdateClientWithMdP(int clientID, [FromBody] ClientDto updatedClient)
+        {
+            if (updatedClient == null)
+                return BadRequest(ModelState);
+
+            if (clientID != updatedClient.id)
+                return BadRequest(ModelState);
+
+            if (!_clientRepository.ClientExists(clientID))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var client = _clientRepository.GetClients().Where(
+            c => c.id == clientID).FirstOrDefault();
+
+            if (client != null)
             {
-                ModelState.AddModelError("", "Le serveur a rencontré un problème");
-                return StatusCode(500, ModelState);
-            }*/
+                client.ClientNom = updatedClient.ClientNom;
+                client.ClientPrenom = updatedClient.ClientPrenom;
+                client.ClientMail = updatedClient.ClientMail;
+                client.ClientAdresse = updatedClient.ClientAdresse;
+                client.ClientContact = updatedClient.ClientContact;
+                client.ClientMotPasse = updatedClient.ClientMotPasse;
+
+                _context.SaveChanges();
+
+            };
 
             return Ok("Modification du client avec succès");
         }

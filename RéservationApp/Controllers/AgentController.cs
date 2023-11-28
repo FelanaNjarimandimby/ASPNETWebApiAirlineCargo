@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RéservationApp.Data;
 using RéservationApp.Dto;
 using RéservationApp.Helper;
 using RéservationApp.Interfaces;
+using RéservationApp.Migrations;
 using RéservationApp.Models;
 using RéservationApp.Repository;
 
@@ -16,12 +18,14 @@ namespace RéservationApp.Controllers
         private readonly IAgentRepository _agentRepository;
         private readonly IMapper _mapper;
         private readonly JwtService _jwtService;
+        private readonly DataContext _context;
 
-        public AgentController(IAgentRepository agentRepository, IMapper mapper, JwtService jwtService) 
+        public AgentController(IAgentRepository agentRepository, IMapper mapper, JwtService jwtService, DataContext context) 
         {
             _agentRepository = agentRepository;
             _mapper = mapper;
             _jwtService = jwtService;
+            _context = context;
         }
 
         [HttpGet]
@@ -63,6 +67,8 @@ namespace RéservationApp.Controllers
             if (agentDto == null)
                 return BadRequest(ModelState);
 
+            var agentMail = _agentRepository.GetAgentMail(agentDto.AgentMail);
+
             var agent = _agentRepository.GetAgents()
                 .Where(a => a.AgentNom == agentDto.AgentNom && a.AgentPrenom == agentDto.AgentPrenom
                 && a.AgentGenre == agentDto.AgentGenre && a.AgentAdresse == agentDto.AgentAdresse
@@ -70,7 +76,7 @@ namespace RéservationApp.Controllers
                 && a.AgentMail == agentDto.AgentMail)
                 .FirstOrDefault();
 
-            if (agent != null)
+            if ((agent != null)  || (agentMail != null))
             {
                 ModelState.AddModelError("", "Agent existe déjà");
                 return StatusCode(422, ModelState);
@@ -144,10 +150,10 @@ namespace RéservationApp.Controllers
         {
             Response.Cookies.Delete("jwt");
 
-            return Ok(new
-            {
-                message = "success"
-            });
+             return Ok(new
+             {
+                 message = "success"
+             });
         }
 
 
@@ -170,15 +176,61 @@ namespace RéservationApp.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var agentMap = _mapper.Map<Agent>(updatedAgent);
-            if (!_agentRepository.UpdateAgent(agentMap))
+            var agent = _agentRepository.GetAgents().Where(a => a.id == agentID).FirstOrDefault();
+            if (agent != null)
             {
-                ModelState.AddModelError("", "Le serveur a rencontré un problème");
-                return StatusCode(500, ModelState);
+                agent.AgentNom = updatedAgent.AgentNom;
+                agent.AgentPrenom = updatedAgent.AgentPrenom;
+                agent.AgentGenre = updatedAgent.AgentGenre;
+                agent.AgentMail = updatedAgent.AgentMail;
+                agent.AgentAdresse = updatedAgent.AgentAdresse;
+                agent.AgentContact = updatedAgent.AgentContact;
+                agent.AgentFonction = updatedAgent.AgentFonction;
+                agent.AgentMotPasse = agent.AgentMotPasse;
+
+                _context.SaveChanges();
             }
 
             return Ok("Modification de l'agent avec succès");
         }
+
+        [HttpPut("Modifier/{agentID}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+
+        public IActionResult UpdateAgentWithMdP(int agentID, [FromBody] AgentDto updatedAgent)
+        {
+            if (updatedAgent == null)
+                return BadRequest(ModelState);
+
+            if (agentID != updatedAgent.id)
+                return BadRequest(ModelState);
+
+            if (!_agentRepository.AgentExists(agentID))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var agent = _agentRepository.GetAgents().Where(a => a.id == agentID).FirstOrDefault();
+            if (agent != null)
+            {
+                agent.AgentNom = updatedAgent.AgentNom;
+                agent.AgentPrenom = updatedAgent.AgentPrenom;
+                agent.AgentGenre = updatedAgent.AgentGenre;
+                agent.AgentMail = updatedAgent.AgentMail;
+                agent.AgentAdresse = updatedAgent.AgentAdresse;
+                agent.AgentContact = updatedAgent.AgentContact;
+                agent.AgentFonction = updatedAgent.AgentFonction;
+                agent.AgentMotPasse = updatedAgent.AgentMotPasse;
+
+                _context.SaveChanges();
+            }
+
+            return Ok("Modification de l'agent avec succès");
+        }
+
 
         [HttpDelete("{agentID}")]
         [ProducesResponseType(204)]
